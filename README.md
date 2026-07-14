@@ -23,25 +23,31 @@ export SIS_API_KEY=your_key_here
 python3 fetch_courses.py
 ```
 
-Or pass the key directly:
+You'll be prompted for a term (e.g. `Fall 2026`) if you don't pass `--term`.
+Or pass everything directly:
 
 ```bash
-python3 fetch_courses.py --key your_key_here
+python3 fetch_courses.py --key your_key_here --term "Fall 2026"
 ```
 
-By default this fetches Applied Mathematics & Statistics courses for
-Fall 2026. Override any of the search parameters:
+By default this fetches Applied Mathematics & Statistics courses. Override
+any of the search parameters:
 
 ```bash
 python3 fetch_courses.py \
   --school "Whiting School of Engineering" \
   --department "EN Applied Mathematics & Statistics" \
   --term "Fall 2026" \
-  --json-out courses.json \
-  --csv-out courses.csv
+  --out-dir "data/2026 Fall"
 ```
 
 ## Output
 
+Data is written to `data/<Year> <Season>/` (e.g. `data/2026 Fall/`), matching
+the term you queried — override with `--out-dir`:
+
 - `courses.json` — raw API response
 - `courses.csv` — flattened table (nested fields are JSON-encoded strings)
+
+If either file already exists, you'll be asked to confirm before it's
+overwritten. Pass `--yes`/`-y` to skip the prompt (e.g. in scripts).
