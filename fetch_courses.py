@@ -1,22 +1,24 @@
 #!/usr/bin/env python3
 """
-Fetch course listings from the JHU SIS Self-Service Public Course Search API.
+Fetch course listings (including prerequisites, restrictions, corequisites,
+and full catalog descriptions) from the Typesense search backend behind
+JHU's public course search site (https://courses.jhu.edu).
 
-API docs: https://sis.jhu.edu/api
+This used to call the documented SIS API (https://sis.jhu.edu/api), but that
+API never populates its `SectionDetails` field (no prereqs/restrictions/
+descriptions) and requires a registered API key. courses.jhu.edu itself gets
+richer data from a Typesense collection instead: it fetches a public,
+search-only-scoped API key from `https://api.sis.jhu.edu/api/coursesearch/configuration`
+(the same key every visitor's browser downloads, no login needed) and
+queries a `sections` collection directly. This script does the same thing.
 
 Usage:
-    python fetch_courses.py --key YOUR_API_KEY \
-        --school "Whiting School of Engineering" \
-        --department "EN Applied Mathematics & Statistics" \
-        --term "Fall 2026"
+    python3 fetch_courses.py --term "Fall 2026"          # skip prompt
+    python3 fetch_courses.py                              # prompts for term
+    python3 fetch_courses.py --term "Fall 2026" --yes      # skip overwrite confirmation
 
-If --term is omitted, you'll be prompted for it interactively. Output is
-written to a "<Year> <Season>" folder (e.g. "2026 Fall/"), matching the
-existing data layout in this repo.
-
-The API key is requested from https://sis.jhu.edu/api (see "Access
-Validation" section) and can also be supplied via the SIS_API_KEY
-environment variable instead of --key.
+No API key is required. Output is written to a "<Year> <Season>" folder
+(e.g. "data/2026 Fall/"), matching the existing data layout in this repo.
 """
 
 import argparse
@@ -24,12 +26,12 @@ import csv
 import json
 import os
 import sys
-from urllib.parse import quote
 
 import requests
 
-API_BASE = "https://sis.jhu.edu/api/classes"
-
+CONFIG_URL = "https://api.sis.jhu.edu/api/coursesearch/configuration"
+COLLECTION = "sections"
+PAGE_SIZE = 250
 
 DATA_DIR = "data"
 
@@ -40,25 +42,53 @@ def term_to_folder(term: str) -> str:
     return os.path.join(DATA_DIR, f"{year} {season}")
 
 
-def fetch_courses(school: str, department: str, term: str, api_key: str) -> list[dict]:
-    """Query the SIS Public Course Search API for a school/department/term.
-
-    A literal "/" in a department name must be replaced with "_" per the
-    API docs before URL-encoding.
-    """
-    department = department.replace("/", "_")
-    path = "/".join(quote(part, safe="") for part in (school, department, term))
-    url = f"{API_BASE}/{path}"
-
-    response = requests.get(url, params={"key": api_key}, timeout=30)
+def get_typesense_config() -> dict:
+    response = requests.get(CONFIG_URL, timeout=30)
     response.raise_for_status()
+    data = response.json()["data"]
+    return {
+        "api_key": data["typesenseApiKey"],
+        "node": data["typesenseNearestNode"],
+    }
 
-    data = response.json()
-    if isinstance(data, dict) and data.get("isError"):
-        message = data.get("apiException", {}).get("exceptionMessage", "Unknown API error")
-        raise RuntimeError(f"SIS API error: {message}")
 
-    return data
+def fetch_courses(school: str, department: str, term: str, config: dict) -> list[dict]:
+    """Page through the Typesense `sections` collection for a school/department/term.
+
+    Filters on AllDepartments (not Department) to match courses.jhu.edu's own
+    matching behavior: it includes courses cross-listed into this department
+    even when it isn't their primary Department (e.g. EN.500.113 lists as
+    "EN General Engineering" but cross-lists into every WSE department).
+    """
+    url = f"https://{config['node']}/collections/{COLLECTION}/documents/search"
+    headers = {"X-TYPESENSE-API-KEY": config["api_key"]}
+    filter_by = f'AllDepartments:="{department}" && Term:="{term}"'
+    if school:
+        filter_by += f' && SchoolName:="{school}"'
+
+    hits = []
+    page = 1
+    while True:
+        response = requests.get(
+            url,
+            headers=headers,
+            params={
+                "q": "*",
+                "filter_by": filter_by,
+                "per_page": PAGE_SIZE,
+                "page": page,
+            },
+            timeout=30,
+        )
+        response.raise_for_status()
+        result = response.json()
+        page_hits = result.get("hits", [])
+        hits.extend(page_hits)
+        if len(hits) >= result.get("found", 0) or not page_hits:
+            break
+        page += 1
+
+    return [hit["document"] for hit in hits]
 
 
 def write_json(courses: list[dict], path: str) -> None:
@@ -94,8 +124,6 @@ def write_csv(courses: list[dict], path: str) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--key", default=os.environ.get("SIS_API_KEY"),
-                         help="SIS API key (or set SIS_API_KEY env var)")
     parser.add_argument("--school", default="Whiting School of Engineering")
     parser.add_argument("--department", default="EN Applied Mathematics & Statistics")
     parser.add_argument("--term", help='Academic term, e.g. "Fall 2026" (prompted if omitted)')
@@ -103,9 +131,6 @@ def main() -> int:
     parser.add_argument("--yes", "-y", action="store_true",
                          help="Overwrite existing output files without prompting")
     args = parser.parse_args()
-
-    if not args.key:
-        parser.error("An API key is required: pass --key or set SIS_API_KEY")
 
     term = args.term or input('Term (e.g. "Fall 2026"): ').strip()
     if not term:
@@ -119,10 +144,10 @@ def main() -> int:
         print("Aborted.")
         return 1
 
+    config = get_typesense_config()
+    courses = fetch_courses(args.school, args.department, term, config)
+
     os.makedirs(out_dir, exist_ok=True)
-
-    courses = fetch_courses(args.school, args.department, term, args.key)
-
     write_json(courses, json_path)
     write_csv(courses, csv_path)
 
