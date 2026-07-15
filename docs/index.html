@@ -1,0 +1,907 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AMS Course Connections</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --muted:          #898781;
+    --gridline:       #e1e0d9;
+    --border:         rgba(11,11,11,0.10);
+    --border-strong:  #c3c2b7;
+    --edge-ink:       #898781;
+    --node-selected:  #eb6834;
+
+    --lvl-1: #2a78d6; /* blue    */
+    --lvl-2: #1baf7a; /* aqua    */
+    --lvl-3: #eda100; /* yellow  */
+    --lvl-4: #008300; /* green   */
+    --lvl-5: #4a3aa7; /* violet  */
+    --lvl-6: #e34948; /* red     */
+    --lvl-7: #e87ba4; /* magenta */
+    --lvl-8: #eb6834; /* orange  */
+    --lvl-9: #898781; /* gray (fallback) */
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --muted:          #898781;
+      --gridline:       #2c2c2a;
+      --border:         rgba(255,255,255,0.10);
+      --border-strong:  #383835;
+      --edge-ink:       #898781;
+      --node-selected:  #d95926;
+
+      --lvl-1: #3987e5;
+      --lvl-2: #199e70;
+      --lvl-3: #c98500;
+      --lvl-4: #008300;
+      --lvl-5: #9085e9;
+      --lvl-6: #e66767;
+      --lvl-7: #d55181;
+      --lvl-8: #d95926;
+      --lvl-9: #898781;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --muted:          #898781;
+    --gridline:       #2c2c2a;
+    --border:         rgba(255,255,255,0.10);
+    --border-strong:  #383835;
+    --edge-ink:       #898781;
+    --node-selected:  #d95926;
+
+    --lvl-1: #3987e5;
+    --lvl-2: #199e70;
+    --lvl-3: #c98500;
+    --lvl-4: #008300;
+    --lvl-5: #9085e9;
+    --lvl-6: #e66767;
+    --lvl-7: #d55181;
+    --lvl-8: #d95926;
+    --lvl-9: #898781;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%;
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  .app { display: flex; flex-direction: column; height: 100vh; }
+
+  header {
+    display: flex; align-items: baseline; gap: 12px;
+    padding: 14px 18px 10px;
+    border-bottom: 1px solid var(--gridline);
+    flex-wrap: wrap;
+  }
+  header h1 { font-size: 16px; margin: 0; font-weight: 600; }
+  header p { margin: 0; color: var(--text-secondary); font-size: 12.5px; }
+  header .spacer { flex: 1; }
+  #themeToggle, #fitBtn {
+    border: 1px solid var(--border-strong); background: var(--surface-1); color: var(--text-primary);
+    border-radius: 6px; padding: 5px 10px; font-size: 12.5px; cursor: pointer;
+  }
+  #themeToggle:hover, #fitBtn:hover { background: var(--gridline); }
+
+  .filters {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 10px 18px; border-bottom: 1px solid var(--gridline);
+    background: var(--surface-1);
+  }
+  .filters input[type="text"] {
+    background: var(--page-plane); border: 1px solid var(--border-strong); color: var(--text-primary);
+    border-radius: 6px; padding: 6px 10px; font-size: 13px; width: 220px;
+  }
+  .filters select {
+    background: var(--page-plane); border: 1px solid var(--border-strong); color: var(--text-primary);
+    border-radius: 6px; padding: 5px 8px; font-size: 12.5px;
+  }
+  .filter-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .filter-group .label { color: var(--text-secondary); font-size: 12px; }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    border: 1px solid var(--border-strong); border-radius: 999px;
+    padding: 3px 9px 3px 7px; font-size: 12px; cursor: pointer; user-select: none;
+    background: var(--page-plane); color: var(--text-secondary);
+  }
+  .chip.active { color: var(--text-primary); border-color: currentColor; }
+  .chip input { display: none; }
+  .chip .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  .chip .swatch { width: 14px; height: 2px; border-radius: 1px; display: inline-block; background: var(--edge-ink); }
+  .chip .swatch.dashed { background: none; border-top: 2px dashed var(--edge-ink); height: 0; }
+  .chip .swatch.dotted { background: none; border-top: 2px dotted var(--edge-ink); height: 0; }
+  .chip .swatch.thick { height: 3px; }
+
+  main { position: relative; flex: 1; min-height: 0; display: flex; }
+  #canvasWrap { position: relative; flex: 1; min-width: 0; }
+  canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+  canvas.dragging { cursor: grabbing; }
+
+  #hint {
+    position: absolute; left: 14px; bottom: 12px; color: var(--muted); font-size: 11.5px;
+    pointer-events: none;
+  }
+  #status {
+    position: absolute; right: 14px; bottom: 12px; color: var(--muted); font-size: 11.5px;
+    pointer-events: none;
+  }
+
+  #tooltip {
+    position: absolute; pointer-events: none; z-index: 5;
+    background: var(--surface-1); border: 1px solid var(--border-strong); border-radius: 6px;
+    padding: 6px 9px; font-size: 12px; max-width: 260px; box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    display: none;
+  }
+  #tooltip .t-code { font-weight: 600; color: var(--text-primary); }
+  #tooltip .t-title { color: var(--text-secondary); }
+  #tooltip .t-rel { color: var(--muted); font-size: 11px; margin-top: 2px; }
+
+  #panel {
+    width: 340px; flex: none; border-left: 1px solid var(--gridline);
+    background: var(--surface-1); overflow-y: auto; padding: 16px;
+    display: none;
+  }
+  #panel.open { display: block; }
+  #panel .code { font-size: 15px; font-weight: 700; }
+  #panel .title { font-size: 13.5px; color: var(--text-secondary); margin: 2px 0 10px; }
+  #panel .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  #panel .meta span {
+    font-size: 11px; color: var(--text-secondary); border: 1px solid var(--border-strong);
+    border-radius: 999px; padding: 2px 8px;
+  }
+  #panel h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted);
+    margin: 16px 0 6px; }
+  #panel .desc { font-size: 12.5px; color: var(--text-secondary); white-space: pre-wrap; }
+  #panel .req-line { font-size: 12.5px; margin-bottom: 6px; }
+  #panel .req-line .note { color: var(--muted); font-size: 11px; display: block; }
+  #panel a.course-link { color: var(--lvl-1); text-decoration: none; cursor: pointer; }
+  #panel a.course-link:hover { text-decoration: underline; }
+  #panel #closePanel {
+    float: right; border: none; background: none; color: var(--muted); font-size: 16px; cursor: pointer;
+    line-height: 1;
+  }
+  #panel .empty { color: var(--muted); font-size: 12.5px; }
+  #panel .termlist { font-size: 12px; color: var(--text-secondary); }
+
+  #loading, #loadError {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 8px; color: var(--text-secondary); font-size: 13px; text-align: center; padding: 20px;
+  }
+  #loadError { display: none; }
+  #loadError code {
+    background: var(--gridline); padding: 2px 6px; border-radius: 4px; font-size: 12px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>AMS Course Connections</h1>
+    <p>Prerequisites, exclusions, and equivalencies across Applied Mathematics &amp; Statistics course offerings — arranged by course level.</p>
+    <div class="spacer"></div>
+    <button id="fitBtn" type="button">Fit to screen</button>
+    <button id="themeToggle" type="button">Toggle theme</button>
+  </header>
+
+  <div class="filters">
+    <div class="filter-group">
+      <input type="text" id="search" placeholder="Search code or title…">
+    </div>
+
+    <div class="filter-group" id="levelLegend">
+      <span class="label">Level</span>
+      <!-- chips injected per level once data loads -->
+    </div>
+
+    <div class="filter-group">
+      <span class="label">Term offered</span>
+      <select id="termFilter">
+        <option value="">Any term</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label class="chip active" id="stubChip">
+        <input type="checkbox" id="stubToggle" checked>
+        <span>Show external prereqs</span>
+      </label>
+    </div>
+
+    <div class="filter-group" id="edgeLegend">
+      <span class="label">Relationships</span>
+      <label class="chip active" data-edge="prerequisite">
+        <input type="checkbox" checked>
+        <span class="swatch"></span>
+        <span>Prerequisite (→)</span>
+      </label>
+      <label class="chip active" data-edge="corequisite">
+        <input type="checkbox" checked>
+        <span class="swatch dotted"></span>
+        <span>Corequisite / can't combine</span>
+      </label>
+      <label class="chip active" data-edge="exclusion">
+        <input type="checkbox" checked>
+        <span class="swatch dashed"></span>
+        <span>Mutually exclusive</span>
+      </label>
+      <label class="chip active" data-edge="equivalent">
+        <input type="checkbox" checked>
+        <span class="swatch thick"></span>
+        <span>Equivalent</span>
+      </label>
+    </div>
+  </div>
+
+  <main>
+    <div id="canvasWrap">
+      <canvas id="graph"></canvas>
+      <div id="tooltip"></div>
+      <div id="hint">Scroll to zoom · drag to pan · click a course for details</div>
+      <div id="status"></div>
+      <div id="loading">Loading course graph…</div>
+      <div id="loadError">
+        Could not load <code>graph.json</code>.<br>
+        Run <code>python3 build_database.py</code> from the repo root, then serve this
+        folder over HTTP (e.g. <code>python3 -m http.server</code> from the repo root) —
+        opening this file directly (<code>file://</code>) blocks the fetch.
+      </div>
+    </div>
+    <div id="panel">
+      <button id="closePanel" type="button">&times;</button>
+      <div id="panelBody"><p class="empty">Click a course to see its details here.</p></div>
+    </div>
+  </main>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ---------------------------------------------------------------------
+  // Theme toggle
+  // ---------------------------------------------------------------------
+  const root = document.documentElement;
+  const themeBtn = document.getElementById("themeToggle");
+  themeBtn.addEventListener("click", () => {
+    const current = root.getAttribute("data-theme");
+    const system = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    const effective = current || system;
+    root.setAttribute("data-theme", effective === "dark" ? "light" : "dark");
+    draw();
+  });
+
+  // ---------------------------------------------------------------------
+  // Load data
+  // ---------------------------------------------------------------------
+  const canvas = document.getElementById("graph");
+  const ctx = canvas.getContext("2d");
+  const wrap = document.getElementById("canvasWrap");
+  const tooltip = document.getElementById("tooltip");
+  const statusEl = document.getElementById("status");
+  const loadingEl = document.getElementById("loading");
+  const loadErrorEl = document.getElementById("loadError");
+
+  let nodeById = new Map();
+
+  fetch("graph.json")
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(g => { init(g); loadingEl.style.display = "none"; })
+    .catch(() => { loadingEl.style.display = "none"; loadErrorEl.style.display = "flex"; });
+
+  const SEASON_ORDER = { Spring: 0, Summer: 1, Fall: 2, Intersession: 3 };
+  function termKey(term) {
+    const [season, year] = term.split(" ");
+    return Number(year) * 10 + (SEASON_ORDER[season] ?? 0);
+  }
+
+  // course number's hundreds digit, e.g. EN.553.310 -> "3". Anything that
+  // doesn't parse falls into a "9" catch-all column.
+  function levelDigit(code) {
+    const m = code.match(/\.(\d)\d{2}$/);
+    return m ? m[1] : "9";
+  }
+  const LEVEL_LABEL = {
+    1: "100s", 2: "200s", 3: "300s", 4: "400s", 5: "500s",
+    6: "600s", 7: "700s", 8: "800s", 9: "other",
+  };
+
+  function courseLabel(code) {
+    const n = nodeById.get(code);
+    return n && n.title ? `${code} (${n.title})` : code;
+  }
+
+  // ---------------------------------------------------------------------
+  // Render model
+  // ---------------------------------------------------------------------
+  const EDGE_STYLE = {
+    prerequisite: { dash: [], arrow: true, width: 1 },
+    corequisite:  { dash: [1, 4], arrow: false, width: 1 },
+    exclusion:    { dash: [6, 4], arrow: false, width: 1 },
+    equivalent:   { dash: [], arrow: false, width: 2.4 },
+  };
+
+  function cssVar(name) {
+    return getComputedStyle(root).getPropertyValue(name).trim();
+  }
+
+  let nodes = [];
+  let edges = [];
+  let allTerms = [];
+  let allLevels = [];
+  let graphBounds = { minX: 0, maxX: 1, minY: 0, maxY: 1 };
+
+  const COLUMN_WIDTH = 300;
+  const ROW_HEIGHT = 20;
+
+  function init(g) {
+    nodeById = new Map();
+    nodes = g.nodes.map(n => ({
+      ...n,
+      level: levelDigit(n.id),
+      x: 0, y: 0,
+      degree: 0,
+    }));
+    nodes.forEach(n => nodeById.set(n.id, n));
+
+    edges = g.edges
+      .filter(e => nodeById.has(e.source) && nodeById.has(e.target))
+      .map(e => ({ ...e, source: nodeById.get(e.source), target: nodeById.get(e.target) }));
+    edges.forEach(e => { e.source.degree++; e.target.degree++; });
+
+    allTerms = Array.from(new Set(nodes.flatMap(n => n.terms))).sort((a, b) => termKey(a) - termKey(b));
+    const termSelect = document.getElementById("termFilter");
+    for (const t of allTerms) {
+      const opt = document.createElement("option");
+      opt.value = t; opt.textContent = t;
+      termSelect.appendChild(opt);
+    }
+
+    layoutStatic();
+    buildLevelLegend();
+    resizeCanvas();
+    applyFilters();
+    fitToScreen();
+    draw();
+  }
+
+  // ---------------------------------------------------------------------
+  // Static layered layout: one column per course-level (course number's
+  // hundreds digit), ordered top-to-bottom within a column by a barycenter
+  // sweep against connected courses. Computed once at load — there is no
+  // physics, no animation, positions never move on their own.
+  // ---------------------------------------------------------------------
+  function layoutStatic() {
+    const columns = new Map();
+    for (const n of nodes) {
+      if (!columns.has(n.level)) columns.set(n.level, []);
+      columns.get(n.level).push(n);
+    }
+    allLevels = Array.from(columns.keys()).sort((a, b) => Number(a) - Number(b));
+    for (const lvl of allLevels) columns.get(lvl).sort((a, b) => a.id.localeCompare(b.id));
+
+    const neighbors = new Map();
+    for (const n of nodes) neighbors.set(n.id, []);
+    for (const e of edges) {
+      neighbors.get(e.source.id).push(e.target.id);
+      neighbors.get(e.target.id).push(e.source.id);
+    }
+
+    function assignFractions() {
+      for (const lvl of allLevels) {
+        const arr = columns.get(lvl);
+        arr.forEach((n, i) => { n._frac = arr.length > 1 ? i / (arr.length - 1) : 0.5; });
+      }
+    }
+    assignFractions();
+
+    for (let pass = 0; pass < 8; pass++) {
+      for (const lvl of allLevels) {
+        const arr = columns.get(lvl);
+        const scored = arr.map(n => {
+          const neigh = neighbors.get(n.id).map(id => nodeById.get(id)).filter(Boolean);
+          const key = neigh.length ? neigh.reduce((s, m) => s + m._frac, 0) / neigh.length : n._frac;
+          return { n, key };
+        });
+        scored.sort((a, b) => a.key - b.key || a.n.id.localeCompare(b.n.id));
+        columns.set(lvl, scored.map(s => s.n));
+      }
+      assignFractions();
+    }
+
+    const maxHeight = Math.max(...allLevels.map(lvl => columns.get(lvl).length)) * ROW_HEIGHT;
+    allLevels.forEach((lvl, ci) => {
+      const arr = columns.get(lvl);
+      const colHeight = arr.length * ROW_HEIGHT;
+      const offsetY = (maxHeight - colHeight) / 2;
+      arr.forEach((n, ri) => {
+        n.x = ci * COLUMN_WIDTH;
+        n.y = offsetY + ri * ROW_HEIGHT;
+        n.r = Math.max(3, Math.min(7, 3 + Math.sqrt(n.degree)));
+      });
+    });
+
+    graphBounds = {
+      minX: -80, maxX: (allLevels.length - 1) * COLUMN_WIDTH + COLUMN_WIDTH,
+      minY: -20, maxY: maxHeight + 20,
+    };
+  }
+
+  function buildLevelLegend() {
+    const container = document.getElementById("levelLegend");
+    for (const lvl of allLevels) {
+      const chip = document.createElement("label");
+      chip.className = "chip active";
+      chip.dataset.level = lvl;
+      const input = document.createElement("input");
+      input.type = "checkbox"; input.checked = true;
+      const dot = document.createElement("span");
+      dot.className = "dot"; dot.style.background = `var(--lvl-${lvl})`;
+      const text = document.createElement("span");
+      text.textContent = LEVEL_LABEL[lvl] || `level ${lvl}`;
+      chip.appendChild(input); chip.appendChild(dot); chip.appendChild(text);
+      input.addEventListener("change", () => {
+        if (input.checked) state.levels.add(lvl); else state.levels.delete(lvl);
+        chip.classList.toggle("active", input.checked);
+        applyFilters();
+      });
+      container.appendChild(chip);
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // Filters
+  // ---------------------------------------------------------------------
+  const state = {
+    search: "",
+    term: "",
+    showStubs: true,
+    edgeTypes: new Set(["prerequisite", "corequisite", "exclusion", "equivalent"]),
+    levels: new Set(),
+  };
+
+  let visibleEdges = [];
+
+  function applyFilters() {
+    if (state.levels.size === 0) allLevels.forEach(l => state.levels.add(l));
+    const q = state.search.trim().toLowerCase();
+    let matchedNode = null, matchCount = 0;
+    for (const n of nodes) {
+      let visible = true;
+      if (!state.showStubs && n.stub) visible = false;
+      if (visible && !state.levels.has(n.level)) visible = false;
+      if (visible && state.term && !n.terms.includes(state.term)) visible = false;
+      if (visible && q) {
+        const hay = (n.id + " " + (n.title || "")).toLowerCase();
+        visible = hay.includes(q);
+      }
+      n.visible = visible;
+      n.matched = q ? visible : true;
+      if (q && visible) { matchCount++; matchedNode = n; }
+    }
+    visibleEdges = edges.filter(e =>
+      state.edgeTypes.has(e.type) && e.source.visible && e.target.visible
+    );
+    const shown = nodes.filter(n => n.visible).length;
+    statusEl.textContent = `${shown} course${shown === 1 ? "" : "s"} · ${visibleEdges.length} connection${visibleEdges.length === 1 ? "" : "s"}`;
+
+    if (matchCount === 1 && matchedNode) centerOn(matchedNode, 1.6);
+    draw();
+  }
+
+  document.getElementById("search").addEventListener("input", e => { state.search = e.target.value; applyFilters(); });
+  document.getElementById("termFilter").addEventListener("change", e => { state.term = e.target.value; applyFilters(); });
+  document.getElementById("stubToggle").addEventListener("change", e => {
+    state.showStubs = e.target.checked;
+    document.getElementById("stubChip").classList.toggle("active", state.showStubs);
+    applyFilters();
+  });
+  document.querySelectorAll("#edgeLegend .chip").forEach(chip => {
+    const type = chip.dataset.edge;
+    const input = chip.querySelector("input");
+    input.addEventListener("change", () => {
+      if (input.checked) state.edgeTypes.add(type); else state.edgeTypes.delete(type);
+      chip.classList.toggle("active", input.checked);
+      applyFilters();
+    });
+  });
+
+  // ---------------------------------------------------------------------
+  // Camera (pan/zoom) — no node dragging, layout is static
+  // ---------------------------------------------------------------------
+  const camera = { x: 0, y: 0, scale: 1 };
+  let hovered = null;
+  let selected = null;
+  let panning = false;
+  let panStart = null;
+  let lastPointer = { x: 0, y: 0 };
+
+  function resizeCanvas() {
+    const rect = wrap.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    canvas.style.width = rect.width + "px";
+    canvas.style.height = rect.height + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener("resize", () => { resizeCanvas(); draw(); });
+
+  function fitToScreen() {
+    const rect = canvas.getBoundingClientRect();
+    const gw = graphBounds.maxX - graphBounds.minX;
+    const gh = graphBounds.maxY - graphBounds.minY;
+    const scale = Math.min(rect.width / gw, rect.height / gh) * 0.94;
+    camera.scale = Math.max(0.08, Math.min(2, scale));
+    const gcx = (graphBounds.minX + graphBounds.maxX) / 2;
+    const gcy = (graphBounds.minY + graphBounds.maxY) / 2;
+    camera.x = -gcx * camera.scale;
+    camera.y = -gcy * camera.scale;
+  }
+  document.getElementById("fitBtn").addEventListener("click", () => { fitToScreen(); draw(); });
+
+  function centerOn(n, scale) {
+    camera.scale = scale;
+    camera.x = -n.x * camera.scale;
+    camera.y = -n.y * camera.scale;
+  }
+
+  function screenToWorld(px, py) {
+    const rect = canvas.getBoundingClientRect();
+    const cx = rect.width / 2, cy = rect.height / 2;
+    return {
+      x: (px - rect.left - cx - camera.x) / camera.scale,
+      y: (py - rect.top - cy - camera.y) / camera.scale,
+    };
+  }
+
+  function nodeAt(px, py) {
+    const { x, y } = screenToWorld(px, py);
+    // Hit radius is defined in screen pixels, not world units, and
+    // converted per-lookup — otherwise a comfortable click target at fit-
+    // to-screen zoom (where camera.scale can be well under 1) shrinks to a
+    // sub-pixel target in world space.
+    const hitPx = 9;
+    let best = null, bestDist = Infinity;
+    for (const n of nodes) {
+      if (!n.visible) continue;
+      const dx = n.x - x, dy = n.y - y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      const hit = Math.max(n.r, hitPx / camera.scale);
+      if (d <= hit && d < bestDist) { best = n; bestDist = d; }
+    }
+    return best;
+  }
+
+  canvas.addEventListener("pointerdown", e => {
+    lastPointer = { x: e.clientX, y: e.clientY };
+    panning = true;
+    panStart = { x: camera.x, y: camera.y, px: e.clientX, py: e.clientY };
+    canvas.classList.add("dragging");
+    canvas.setPointerCapture(e.pointerId);
+  });
+
+  canvas.addEventListener("pointermove", e => {
+    if (panning && (Math.abs(e.clientX - lastPointer.x) > 2 || Math.abs(e.clientY - lastPointer.y) > 2)) {
+      camera.x = panStart.x + (e.clientX - panStart.px);
+      camera.y = panStart.y + (e.clientY - panStart.py);
+      hideTooltip();
+      draw();
+      return;
+    }
+    const n = nodeAt(e.clientX, e.clientY);
+    const changed = n !== hovered;
+    hovered = n;
+    if (n) showTooltip(n, e.clientX, e.clientY); else hideTooltip();
+    if (changed) draw();
+  });
+
+  function endDrag(e) {
+    if (panning) { panning = false; canvas.classList.remove("dragging"); canvas.releasePointerCapture(e.pointerId); }
+  }
+  canvas.addEventListener("pointerup", e => {
+    const moved = Math.abs(e.clientX - lastPointer.x) > 3 || Math.abs(e.clientY - lastPointer.y) > 3;
+    const clickedNode = !moved ? nodeAt(e.clientX, e.clientY) : null;
+    endDrag(e);
+    if (clickedNode) selectNode(clickedNode);
+  });
+  canvas.addEventListener("pointerleave", () => { hideTooltip(); draw(); });
+
+  canvas.addEventListener("wheel", e => {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const cx = rect.width / 2, cy = rect.height / 2;
+    const mx = e.clientX - rect.left - cx, my = e.clientY - rect.top - cy;
+    const worldX = (mx - camera.x) / camera.scale;
+    const worldY = (my - camera.y) / camera.scale;
+    const factor = Math.exp(-e.deltaY * 0.0015);
+    camera.scale = Math.min(4, Math.max(0.08, camera.scale * factor));
+    camera.x = mx - worldX * camera.scale;
+    camera.y = my - worldY * camera.scale;
+    draw();
+  }, { passive: false });
+
+  function showTooltip(n, px, py) {
+    const rect = wrap.getBoundingClientRect();
+    tooltip.innerHTML = "";
+    const code = document.createElement("div"); code.className = "t-code"; code.textContent = n.id;
+    tooltip.appendChild(code);
+    if (n.title) {
+      const title = document.createElement("div"); title.className = "t-title"; title.textContent = n.title;
+      tooltip.appendChild(title);
+    }
+    if (n.stub) {
+      const rel = document.createElement("div"); rel.className = "t-rel"; rel.textContent = "Referenced course (not offered by AMS)";
+      tooltip.appendChild(rel);
+    }
+    tooltip.style.display = "block";
+    let left = px - rect.left + 14, top = py - rect.top + 14;
+    if (left + 260 > rect.width) left = px - rect.left - 260 - 14;
+    tooltip.style.left = left + "px";
+    tooltip.style.top = top + "px";
+  }
+  function hideTooltip() { tooltip.style.display = "none"; }
+
+  // ---------------------------------------------------------------------
+  // Detail panel
+  // ---------------------------------------------------------------------
+  const panel = document.getElementById("panel");
+  const panelBody = document.getElementById("panelBody");
+  document.getElementById("closePanel").addEventListener("click", () => {
+    panel.classList.remove("open");
+    selected = null;
+    draw();
+  });
+
+  function el(tag, props = {}, children = []) {
+    const node = document.createElement(tag);
+    for (const [k, v] of Object.entries(props)) {
+      if (k === "text") node.textContent = v;
+      else if (k === "class") node.className = v;
+      else node.setAttribute(k, v);
+    }
+    for (const c of children) node.appendChild(c);
+    return node;
+  }
+
+  function courseLink(code) {
+    const n = nodeById.get(code);
+    const label = n && n.title ? `${code} — ${n.title}` : code;
+    const a = el("a", { class: "course-link", text: label });
+    a.addEventListener("click", () => { if (n) selectNode(n); });
+    return a;
+  }
+
+  function reqBlock(entries, prefix) {
+    if (!entries.length) return null;
+    const wrap = document.createElement("div");
+    for (const req of entries) {
+      const line = el("div", { class: "req-line" });
+      const label = req.is_exclusion ? "Cannot also take: " : prefix;
+      line.appendChild(document.createTextNode(label));
+      renderTree(req.logic, line);
+      wrap.appendChild(line);
+      if (req.description) {
+        const note = el("span", { class: "note", text: req.description });
+        wrap.appendChild(note);
+      }
+    }
+    return wrap;
+  }
+
+  function renderTree(node, container) {
+    if (node.type === "COURSE") { container.appendChild(courseLink(node.course)); return; }
+    const joiner = node.type === "ALL" ? " and " : " or ";
+    node.children.forEach((c, i) => {
+      if (i > 0) container.appendChild(document.createTextNode(joiner));
+      const wrapParens = c.type !== "COURSE";
+      if (wrapParens) container.appendChild(document.createTextNode("("));
+      renderTree(c, container);
+      if (wrapParens) container.appendChild(document.createTextNode(")"));
+    });
+  }
+
+  function selectNode(n) {
+    selected = n;
+    panel.classList.add("open");
+    panelBody.innerHTML = "";
+
+    panelBody.appendChild(el("div", { class: "code", text: n.id }));
+    panelBody.appendChild(el("div", { class: "title", text: n.title || (n.stub ? "Referenced course (outside AMS scrape scope)" : "") }));
+
+    const meta = el("div", { class: "meta" });
+    if (n.level) meta.appendChild(el("span", { text: LEVEL_LABEL[n.level] || n.level }));
+    if (n.credits) meta.appendChild(el("span", { text: n.credits + " cr" }));
+    if (n.department) meta.appendChild(el("span", { text: n.department.replace(/^EN |^AS /, "") }));
+    if (n.cross_listed) meta.appendChild(el("span", { text: "Cross-listed" }));
+    panelBody.appendChild(meta);
+
+    if (n.description) {
+      panelBody.appendChild(el("h3", { text: "Description" }));
+      panelBody.appendChild(el("div", { class: "desc", text: n.description }));
+    }
+
+    const preBlock = reqBlock(n.prerequisites || [], "Requires: ");
+    if (preBlock) {
+      panelBody.appendChild(el("h3", { text: "Prerequisites" }));
+      panelBody.appendChild(preBlock);
+    }
+
+    const coBlock = reqBlock((n.corequisites || []).map(c => ({ ...c, is_exclusion: false })), "Cannot combine with: ");
+    if (coBlock) {
+      panelBody.appendChild(el("h3", { text: "Corequisite notes" }));
+      panelBody.appendChild(coBlock);
+    }
+
+    const unlocks = edges.filter(e => e.type === "prerequisite" && e.source.id === n.id).map(e => e.target.id);
+    const excludedBy = edges.filter(e => e.type === "exclusion" && (e.source.id === n.id || e.target.id === n.id))
+      .map(e => (e.source.id === n.id ? e.target.id : e.source.id));
+    const equivalents = edges.filter(e => e.type === "equivalent" && (e.source.id === n.id || e.target.id === n.id))
+      .map(e => (e.source.id === n.id ? e.target.id : e.source.id));
+
+    if (unlocks.length) {
+      panelBody.appendChild(el("h3", { text: "Is a prerequisite for" }));
+      const list = document.createElement("div");
+      Array.from(new Set(unlocks)).forEach(code => { list.appendChild(courseLink(code)); list.appendChild(document.createElement("br")); });
+      panelBody.appendChild(list);
+    }
+    if (excludedBy.length) {
+      panelBody.appendChild(el("h3", { text: "Mutually exclusive with" }));
+      const list = document.createElement("div");
+      Array.from(new Set(excludedBy)).forEach(code => { list.appendChild(courseLink(code)); list.appendChild(document.createElement("br")); });
+      panelBody.appendChild(list);
+    }
+    if (equivalents.length) {
+      panelBody.appendChild(el("h3", { text: "Equivalent to" }));
+      const list = document.createElement("div");
+      Array.from(new Set(equivalents)).forEach(code => { list.appendChild(courseLink(code)); list.appendChild(document.createElement("br")); });
+      panelBody.appendChild(list);
+    }
+
+    if (n.terms && n.terms.length) {
+      panelBody.appendChild(el("h3", { text: "Terms offered" }));
+      panelBody.appendChild(el("div", { class: "termlist", text: n.terms.join(", ") }));
+    }
+
+    draw();
+  }
+
+  // ---------------------------------------------------------------------
+  // Render (static layout — this redraws the camera transform only; node
+  // positions never change on their own, so this is cheap and only runs
+  // again on interaction, not continuously)
+  // ---------------------------------------------------------------------
+  function neighborSet(n) {
+    const set = new Set([n.id]);
+    for (const e of visibleEdges) {
+      if (e.source.id === n.id) set.add(e.target.id);
+      if (e.target.id === n.id) set.add(e.source.id);
+    }
+    return set;
+  }
+
+  function truncate(text, max) {
+    if (!text) return "";
+    return text.length > max ? text.slice(0, max - 1) + "…" : text;
+  }
+
+  function draw() {
+    const rect = canvas.getBoundingClientRect();
+    ctx.clearRect(0, 0, rect.width, rect.height);
+    ctx.save();
+    ctx.translate(rect.width / 2 + camera.x, rect.height / 2 + camera.y);
+    ctx.scale(camera.scale, camera.scale);
+
+    // column headers
+    ctx.font = `${12}px system-ui, sans-serif`;
+    ctx.fillStyle = cssVar("--muted");
+    ctx.textBaseline = "alphabetic";
+    allLevels.forEach((lvl, ci) => {
+      ctx.fillText(LEVEL_LABEL[lvl] || lvl, ci * COLUMN_WIDTH, graphBounds.minY - 4);
+    });
+
+    const focus = hovered || selected;
+    const focusSet = focus ? neighborSet(focus) : null;
+    const edgeInk = cssVar("--edge-ink");
+
+    for (const e of visibleEdges) {
+      const style = EDGE_STYLE[e.type];
+      const dim = focusSet && !(focusSet.has(e.source.id) && focusSet.has(e.target.id));
+      const s = e.source, t = e.target;
+
+      ctx.beginPath();
+      if (s.level === t.level) {
+        const bulge = 26 + Math.abs(s.y - t.y) * 0.12;
+        const midY = (s.y + t.y) / 2;
+        ctx.moveTo(s.x, s.y);
+        ctx.bezierCurveTo(s.x + bulge, s.y, t.x + bulge, t.y, t.x, t.y);
+      } else {
+        const dx = (t.x - s.x) * 0.5;
+        ctx.moveTo(s.x, s.y);
+        ctx.bezierCurveTo(s.x + dx, s.y, t.x - dx, t.y, t.x, t.y);
+      }
+      ctx.setLineDash(style.dash);
+      ctx.strokeStyle = edgeInk;
+      ctx.globalAlpha = dim ? 0.06 : 0.4;
+      ctx.lineWidth = style.width / camera.scale;
+      ctx.stroke();
+
+      if (style.arrow && !dim) {
+        const dx = t.x - s.x, dy = t.y - s.y;
+        const len = Math.sqrt(dx * dx + dy * dy) || 1;
+        const ux = dx / len, uy = dy / len;
+        const tx = t.x - ux * (t.r + 3);
+        const ty = t.y - uy * (t.r + 3);
+        const size = 4.5 / camera.scale;
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(tx - ux * size - uy * size * 0.6, ty - uy * size + ux * size * 0.6);
+        ctx.lineTo(tx - ux * size + uy * size * 0.6, ty - uy * size - ux * size * 0.6);
+        ctx.closePath();
+        ctx.fillStyle = edgeInk;
+        ctx.globalAlpha = 0.5;
+        ctx.fill();
+      }
+    }
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+
+    const textColor = cssVar("--text-primary");
+    const secColor = cssVar("--text-secondary");
+    const selColor = cssVar("--node-selected");
+    const titleBudget = Math.max(0, Math.floor((COLUMN_WIDTH - 90) / 6));
+
+    for (const n of nodes) {
+      if (!n.visible) continue;
+      const dim = (focusSet && !focusSet.has(n.id)) || (state.search && !n.matched);
+      ctx.globalAlpha = dim ? 0.15 : 1;
+
+      const levelColor = cssVar(`--lvl-${n.level}`);
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fillStyle = n.stub ? "transparent" : levelColor;
+      ctx.fill();
+      ctx.lineWidth = (n === selected ? 2.5 : 1.2) / camera.scale;
+      ctx.strokeStyle = n === selected ? selColor : levelColor;
+      if (n.stub) ctx.setLineDash([2, 2]); else ctx.setLineDash([]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.font = `${11}px system-ui, sans-serif`;
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = n === selected ? selColor : textColor;
+      ctx.fillText(n.id, n.x + n.r + 5, n.y);
+
+      if (n.title) {
+        const codeWidth = ctx.measureText(n.id).width;
+        ctx.fillStyle = secColor;
+        ctx.fillText(truncate(n.title, titleBudget), n.x + n.r + 9 + codeWidth, n.y);
+      }
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+})();
+</script>
+</body>
+</html>

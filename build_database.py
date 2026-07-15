@@ -14,12 +14,15 @@ Two outputs are written:
   `courses`, `course_terms`, `prereq_nodes`, `corequisite_nodes`,
   `equivalencies`. Prerequisite/corequisite logic is stored as a tree
   (self-referencing `parent_id`) rather than flattened, so "(A or B) and C"
-  is preserved exactly rather than collapsed into loose edges.
-- `db/graph.json`: a nodes/edges export flattened from the database, meant
-  to be loaded directly by a web-based visualizer without needing SQL in
-  the browser. Each node keeps its full prerequisite/corequisite tree
-  (`prerequisites`/`corequisites`) in addition to the flattened `edges`
-  list, so a consumer can render a simple graph or the exact logic.
+  is preserved exactly rather than collapsed into loose edges. Gitignored —
+  fully reproducible from `data/` by re-running this script.
+- `docs/graph.json`: a nodes/edges export flattened from the database, for
+  the static visualizer at `docs/index.html`. `docs/` doubles as the GitHub
+  Pages source, so this file is committed (unlike `db/`) — the published
+  site has no build step and fetches it directly. Each node keeps its full
+  prerequisite/corequisite tree (`prerequisites`/`corequisites`) in
+  addition to the flattened `edges` list, so a consumer can render a simple
+  graph or the exact logic.
 
 Courses referenced as prerequisites but never scraped themselves (e.g.
 AS.110.202 Calculus III, outside the AMS department scope of this repo's
@@ -27,8 +30,8 @@ scraper) get a "stub" node, titled from `PrereqCoursesCatalogs` when
 available, so prerequisite edges always resolve to a real node.
 
 Usage:
-    python3 build_database.py              # reads data/, writes db/
-    python3 build_database.py --data-dir data --out-dir db
+    python3 build_database.py              # reads data/, writes db/ + docs/graph.json
+    python3 build_database.py --data-dir data --db-dir db --docs-dir docs
 """
 
 from __future__ import annotations
@@ -41,7 +44,8 @@ import sqlite3
 from collections import Counter, defaultdict
 
 DATA_DIR = "data"
-OUT_DIR = "db"
+DB_DIR = "db"
+DOCS_DIR = "docs"
 
 
 # ---------------------------------------------------------------------------
@@ -546,7 +550,8 @@ def build_graph(courses: dict[str, dict]) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-dir", default=DATA_DIR, help="Folder of scraped term data")
-    parser.add_argument("--out-dir", default=OUT_DIR, help="Folder to write courses.db/graph.json")
+    parser.add_argument("--db-dir", default=DB_DIR, help="Folder to write courses.db")
+    parser.add_argument("--docs-dir", default=DOCS_DIR, help="Folder to write graph.json (GitHub Pages source)")
     args = parser.parse_args()
 
     term_files = load_term_files(args.data_dir)
@@ -559,14 +564,15 @@ def main() -> int:
     print(f"Loaded {len(term_files)} term file(s), {len(courses)} distinct course(s) "
           f"({scraped} scraped, {stubs} referenced-only stubs).")
 
-    os.makedirs(args.out_dir, exist_ok=True)
+    os.makedirs(args.db_dir, exist_ok=True)
+    os.makedirs(args.docs_dir, exist_ok=True)
 
-    db_path = os.path.join(args.out_dir, "courses.db")
+    db_path = os.path.join(args.db_dir, "courses.db")
     build_database(courses, db_path)
     print(f"Wrote {db_path}")
 
     graph = build_graph(courses)
-    graph_path = os.path.join(args.out_dir, "graph.json")
+    graph_path = os.path.join(args.docs_dir, "graph.json")
     with open(graph_path, "w") as f:
         json.dump(graph, f, indent=2)
     print(f"Wrote {graph_path} ({len(graph['nodes'])} nodes, {len(graph['edges'])} edges)")
