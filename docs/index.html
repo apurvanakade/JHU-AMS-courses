@@ -71,6 +71,7 @@
   }
   header h1 { font-size: 16px; margin: 0; font-weight: 600; }
   header p { margin: 0; color: var(--text-secondary); font-size: 12.5px; }
+  header #lastUpdated { margin: 0; color: var(--muted); font-size: 12.5px; }
   header .spacer { flex: 1; }
   #themeToggle, #fitBtn {
     border: 1px solid var(--border-strong); background: var(--surface-1); color: var(--text-primary);
@@ -195,6 +196,7 @@
   <header>
     <h1>AMS Course Connections</h1>
     <p>Prerequisites, exclusions, and equivalencies across Applied Mathematics &amp; Statistics course offerings — arranged by course level.</p>
+    <span id="lastUpdated"></span>
     <div class="spacer"></div>
     <button id="fitBtn" type="button">Fit to screen</button>
     <button id="themeToggle" type="button">Toggle theme</button>
@@ -428,6 +430,12 @@
 
   function init(g) {
     nodeById = new Map();
+    const lastUpdatedEl = document.getElementById("lastUpdated");
+    if (g.generated_at) {
+      const d = new Date(g.generated_at);
+      lastUpdatedEl.textContent = isNaN(d) ? "" :
+        "Updated " + d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    }
     nodes = g.nodes.map(n => ({
       ...n,
       col: levelDigit(n.id),          // course-number column, e.g. "4" for the 400s
@@ -555,7 +563,16 @@
   // ---------------------------------------------------------------------
   // Filters
   // ---------------------------------------------------------------------
-  const DEFAULT_TERM = "Fall 2026";
+  // Mirrors the Jan-Jun -> Spring / Jul-Dec -> Fall heuristic in
+  // scripts/refresh_terms.py, so the default view always tracks "now"
+  // instead of going stale as a hardcoded term would.
+  function computeDefaultTerm() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1; // 1-12
+    return (month >= 1 && month <= 6) ? `Spring ${year}` : `Fall ${year}`;
+  }
+  const DEFAULT_TERM = computeDefaultTerm();
 
   const state = {
     search: "",

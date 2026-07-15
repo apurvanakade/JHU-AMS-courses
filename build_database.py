@@ -46,6 +46,7 @@ import json
 import os
 import sqlite3
 from collections import Counter, defaultdict
+from datetime import datetime, timezone
 
 DATA_DIR = "data"
 DB_DIR = "db"
@@ -256,7 +257,7 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> dict[str, dict]:
                 referenced |= referenced_courses(parse_expression(expr))
         referenced |= row["equivalent_to"]
 
-    for code in referenced - courses.keys():
+    for code in sorted(referenced - courses.keys()):
         courses[code] = {
             "code": code, "title": external_titles.get(code), "description": None,
             "department": None, "school": None, "level": None, "credits": None,
@@ -354,6 +355,11 @@ CREATE TABLE equivalencies (
     PRIMARY KEY (course_a, course_b)
 );
 
+CREATE TABLE metadata (
+    key TEXT PRIMARY KEY,
+    value TEXT
+);
+
 CREATE INDEX idx_prereq_course ON prereq_nodes(course_code);
 CREATE INDEX idx_prereq_ref ON prereq_nodes(ref_course_code);
 CREATE INDEX idx_coreq_course ON corequisite_nodes(course_code);
@@ -361,12 +367,13 @@ CREATE INDEX idx_coreq_ref ON corequisite_nodes(ref_course_code);
 """
 
 
-def build_database(courses: dict[str, dict], db_path: str) -> None:
+def build_database(courses: dict[str, dict], db_path: str, generated_at: str) -> None:
     if os.path.exists(db_path):
         os.remove(db_path)
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
     cur.executescript(SCHEMA)
+    cur.execute("INSERT INTO metadata (key, value) VALUES ('generated_at', ?)", (generated_at,))
 
     for code, c in courses.items():
         cur.execute(
@@ -523,7 +530,7 @@ def flatten_edges(course_code: str, node: dict, edge_type: str, group_id: int,
             flatten_edges(course_code, child, edge_type, group_id, is_exclusion, edges)
 
 
-def build_graph(courses: dict[str, dict]) -> dict:
+def build_graph(courses: dict[str, dict], generated_at: str) -> dict:
     nodes = []
     edges = []
     group_id = 0
@@ -587,7 +594,7 @@ def build_graph(courses: dict[str, dict]) -> dict:
             edges.append({"source": pair[0], "target": pair[1], "type": "equivalent",
                            "group_id": None, "logic": None})
 
-    return {"nodes": nodes, "edges": edges}
+    return {"generated_at": generated_at, "nodes": nodes, "edges": edges}
 
 
 # ---------------------------------------------------------------------------
@@ -613,11 +620,13 @@ def main() -> int:
     os.makedirs(args.db_dir, exist_ok=True)
     os.makedirs(args.docs_dir, exist_ok=True)
 
+    generated_at = datetime.now(timezone.utc).isoformat()
+
     db_path = os.path.join(args.db_dir, "courses.db")
-    build_database(courses, db_path)
+    build_database(courses, db_path, generated_at)
     print(f"Wrote {db_path}")
 
-    graph = build_graph(courses)
+    graph = build_graph(courses, generated_at)
     graph_path = os.path.join(args.docs_dir, "graph.json")
     with open(graph_path, "w") as f:
         json.dump(graph, f, indent=2)
