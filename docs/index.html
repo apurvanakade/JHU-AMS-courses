@@ -219,12 +219,12 @@
         <input type="checkbox" checked>
         <span>Undergraduate</span>
       </label>
-      <label class="chip active" data-degree="Graduate">
-        <input type="checkbox" checked>
+      <label class="chip" data-degree="Graduate">
+        <input type="checkbox">
         <span>Graduate</span>
       </label>
-      <label class="chip active" data-degree="Independent">
-        <input type="checkbox" checked>
+      <label class="chip" data-degree="Independent">
+        <input type="checkbox">
         <span>Independent study</span>
       </label>
     </div>
@@ -237,31 +237,31 @@
     </div>
 
     <div class="filter-group">
-      <label class="chip active" id="stubChip">
-        <input type="checkbox" id="stubToggle" checked>
+      <label class="chip" id="stubChip">
+        <input type="checkbox" id="stubToggle">
         <span>Show external prereqs</span>
       </label>
     </div>
 
     <div class="filter-group" id="edgeLegend">
       <span class="label">Relationships</span>
-      <label class="chip active" data-edge="prerequisite">
-        <input type="checkbox" checked>
+      <label class="chip" data-edge="prerequisite">
+        <input type="checkbox">
         <span class="swatch"></span>
         <span>Prerequisite (→)</span>
       </label>
-      <label class="chip active" data-edge="corequisite">
-        <input type="checkbox" checked>
+      <label class="chip" data-edge="corequisite">
+        <input type="checkbox">
         <span class="swatch dotted"></span>
         <span>Corequisite / can't combine</span>
       </label>
-      <label class="chip active" data-edge="exclusion">
-        <input type="checkbox" checked>
+      <label class="chip" data-edge="exclusion">
+        <input type="checkbox">
         <span class="swatch dashed"></span>
         <span>Mutually exclusive</span>
       </label>
-      <label class="chip active" data-edge="equivalent">
-        <input type="checkbox" checked>
+      <label class="chip" data-edge="equivalent">
+        <input type="checkbox">
         <span class="swatch thick"></span>
         <span>Equivalent</span>
       </label>
@@ -402,6 +402,8 @@
       opt.value = t; opt.textContent = t;
       termSelect.appendChild(opt);
     }
+    if (allTerms.includes(state.term)) termSelect.value = state.term;
+    else state.term = ""; // default term isn't in this data; fall back to "Any term"
 
     layoutStatic();
     buildLevelLegend();
@@ -498,12 +500,14 @@
   // ---------------------------------------------------------------------
   // Filters
   // ---------------------------------------------------------------------
+  const DEFAULT_TERM = "Fall 2026";
+
   const state = {
     search: "",
-    term: "",
-    degree: new Set(["Undergraduate", "Graduate", "Independent"]),
-    showStubs: true,
-    edgeTypes: new Set(["prerequisite", "corequisite", "exclusion", "equivalent"]),
+    term: DEFAULT_TERM,
+    degree: new Set(["Undergraduate"]),
+    showStubs: false,
+    edgeTypes: new Set(),
     levels: new Set(),
   };
 
