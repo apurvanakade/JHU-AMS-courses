@@ -11,8 +11,12 @@ old EN.550.xxx codes that were renumbered to EN.553.xxx).
 Two outputs are written:
 
 - `db/courses.db` (SQLite): the queryable source of truth. Tables:
-  `courses`, `course_terms`, `prereq_nodes`, `corequisite_nodes`,
-  `equivalencies`. Prerequisite/corequisite logic is stored as a tree
+  `courses`, `course_terms`, `course_sections`, `prereq_nodes`,
+  `corequisite_nodes`, `equivalencies`. `course_sections` holds one row per
+  actual section per term (instructors, syllabus URL) since a single course
+  can have many sections in one term taught by different people — this data
+  doesn't collapse to one row per course the way `courses` does.
+  Prerequisite/corequisite logic is stored as a tree
   (self-referencing `parent_id`) rather than flattened, so "(A or B) and C"
   is preserved exactly rather than collapsed into loose edges. Gitignored —
   fully reproducible from `data/` by re-running this script.
@@ -156,6 +160,7 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> dict[str, dict]:
         "levels": [], "credits": [], "all_departments": set(),
         "areas": set(), "pos_tags": set(), "cross_listed": set(),
         "terms": set(),
+        "sections": [],     # list of (term, section, instructors, syllabus_url)
         "prereq_raw": [],   # list of (expression, description, is_negative)
         "coreq_raw": [],    # list of (expression, description)
         "equivalent_to": set(),
@@ -175,6 +180,12 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> dict[str, dict]:
             row["all_departments"].update(rec.get("AllDepartments") or [])
             row["terms"].add(rec.get("Term"))
             row["cross_listed"].add(rec.get("SectionDetails", {}).get("CrossListed"))
+            row["sections"].append((
+                rec.get("Term"),
+                rec.get("SectionName"),
+                tuple(rec.get("InstructorsDelimited") or []),
+                rec.get("Syllabus_Url"),
+            ))
 
             for area in rec.get("Areas") or []:
                 desc = area.get("Description") if isinstance(area, dict) else area
@@ -216,6 +227,7 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> dict[str, dict]:
             "pos_tags": sorted(row["pos_tags"]),
             "cross_listed": "Y" in row["cross_listed"],
             "terms": sorted(row["terms"], key=_term_sort_key),
+            "sections": dedupe_preserve_order(row["sections"]),
             "prereq_raw": dedupe_preserve_order(row["prereq_raw"]),
             "coreq_raw": dedupe_preserve_order(row["coreq_raw"]),
             "equivalent_to": sorted(row["equivalent_to"]),
@@ -244,7 +256,7 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> dict[str, dict]:
             "code": code, "title": external_titles.get(code), "description": None,
             "department": None, "school": None, "level": None, "credits": None,
             "all_departments": [], "areas": [], "pos_tags": [], "cross_listed": False,
-            "terms": [], "prereq_raw": [], "coreq_raw": [], "equivalent_to": [],
+            "terms": [], "sections": [], "prereq_raw": [], "coreq_raw": [], "equivalent_to": [],
             "stub": True,
         }
 
@@ -295,6 +307,15 @@ CREATE TABLE course_terms (
     code TEXT REFERENCES courses(code),
     term TEXT,
     PRIMARY KEY (code, term)
+);
+
+CREATE TABLE course_sections (
+    code TEXT REFERENCES courses(code),
+    term TEXT,
+    section TEXT,
+    instructors TEXT,       -- JSON array of full names, e.g. "Miller, John C"
+    syllabus_url TEXT,
+    PRIMARY KEY (code, term, section)
 );
 
 CREATE TABLE prereq_nodes (
@@ -350,6 +371,13 @@ def build_database(courses: dict[str, dict], db_path: str) -> None:
         )
         for term in c["terms"]:
             cur.execute("INSERT INTO course_terms (code, term) VALUES (?, ?)", (code, term))
+
+        for term, section, instructors, syllabus_url in c["sections"]:
+            cur.execute(
+                "INSERT INTO course_sections (code, term, section, instructors, syllabus_url) "
+                "VALUES (?, ?, ?, ?, ?)",
+                (code, term, section, json.dumps(list(instructors)), syllabus_url),
+            )
 
         for expression, description, is_negative in c["prereq_raw"]:
             if not expression:
