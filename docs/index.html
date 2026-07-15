@@ -365,8 +365,8 @@
   let allLevels = [];
   let graphBounds = { minX: 0, maxX: 1, minY: 0, maxY: 1 };
 
-  const COLUMN_WIDTH = 300;
-  const ROW_HEIGHT = 20;
+  const COLUMN_WIDTH = 320;
+  const ROW_HEIGHT = 28;
 
   function init(g) {
     nodeById = new Map();
@@ -407,12 +407,27 @@
     });
   }
 
-  // Courses to lay out for a given term: everything actually offered that
-  // term, plus stub/external reference courses (they have no term data of
-  // their own, so they're never excluded by a term choice — only by the
-  // "Show external prereqs" toggle).
-  function nodesForLayout(term) {
-    return nodes.filter(n => n.stub || n.terms.includes(term));
+  // Courses to lay out under the current term/level/external-prereqs
+  // filters — the same criteria applyFilters() uses to decide visibility,
+  // minus the free-text search (search dims/hides within a layout rather
+  // than reshuffling it on every keystroke). Mirroring applyFilters() here
+  // is what keeps filtered-out courses from leaving empty rows in their
+  // column: a course that won't be shown never reserves a slot.
+  function nodesForLayout() {
+    return nodes.filter(n => {
+      if (!state.showStubs && n.stub) return false;
+      if (n.degreeLevel && !state.degree.has(n.degreeLevel)) return false;
+      if (!n.stub && !n.terms.includes(state.term)) return false;
+      return true;
+    });
+  }
+
+  // Recompute column positions for the current filters and reframe the
+  // camera. Called whenever term/level/external-prereqs changes — not on
+  // search, which only dims/hides within the existing layout.
+  function relayout() {
+    layoutStatic(nodesForLayout());
+    fitToScreen();
   }
 
   // ---------------------------------------------------------------------
@@ -536,8 +551,7 @@
     document.getElementById("stubToggle").checked = state.showStubs;
     document.getElementById("stubChip").classList.toggle("active", state.showStubs);
 
-    layoutStatic(nodesForLayout(state.term));
-    fitToScreen();
+    relayout();
     applyFilters(false);
 
     const focusNode = nodeById.get(params.get("focus"));
@@ -580,8 +594,7 @@
   document.getElementById("search").addEventListener("input", e => { state.search = e.target.value; applyFilters(false); });
   document.getElementById("termFilter").addEventListener("change", e => {
     state.term = e.target.value;
-    layoutStatic(nodesForLayout(state.term));
-    fitToScreen();
+    relayout();
     applyFilters(true);
   });
   document.querySelectorAll("#degreeLegend .chip").forEach(chip => {
@@ -590,12 +603,14 @@
     input.addEventListener("change", () => {
       if (input.checked) state.degree.add(degree); else state.degree.delete(degree);
       chip.classList.toggle("active", input.checked);
+      relayout();
       applyFilters(true);
     });
   });
   document.getElementById("stubToggle").addEventListener("change", e => {
     state.showStubs = e.target.checked;
     document.getElementById("stubChip").classList.toggle("active", state.showStubs);
+    relayout();
     applyFilters(true);
   });
 
