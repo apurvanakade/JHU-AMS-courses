@@ -984,19 +984,19 @@
       panelBody.appendChild(list);
     }
 
-    if (n.sections && n.sections.length) {
-      panelBody.appendChild(el("h3", { text: "Sections" }));
+    const currentSections = (n.sections || []).filter(s => s.term === state.term);
+    if (currentSections.length) {
+      panelBody.appendChild(el("h3", { text: `Sections — ${state.term}` }));
       const table = el("table", { class: "sections" });
       const thead = el("tr");
-      for (const h of ["Term", "Sec", "Instructor(s)", "Seats", "Status", ""]) {
+      for (const h of ["Sec", "Instructor(s)", "Seats", "Status", ""]) {
         thead.appendChild(el("th", { text: h }));
       }
       table.appendChild(thead);
-      const sorted = [...n.sections].sort((a, b) => termKey(b.term) - termKey(a.term));
+      const sorted = [...currentSections].sort((a, b) => (a.section || "").localeCompare(b.section || ""));
       for (const s of sorted) {
         const row = el("tr");
-        row.appendChild(el("td", { class: "section-term", text: s.term }));
-        row.appendChild(el("td", { text: s.section || "" }));
+        row.appendChild(el("td", { class: "section-term", text: s.section || "" }));
         row.appendChild(el("td", { class: "section-instructors", text: (s.instructors || []).join(", ") }));
         row.appendChild(el("td", { text: s.seats_available || "" }));
         row.appendChild(el("td", { text: s.status || "" }));
@@ -1012,9 +1012,13 @@
       }
       const scroll = el("div", { class: "table-scroll" }, [table]);
       panelBody.appendChild(scroll);
-    } else if (n.terms && n.terms.length) {
-      panelBody.appendChild(el("h3", { text: "Terms offered" }));
-      panelBody.appendChild(el("div", { class: "termlist", text: n.terms.join(", ") }));
+    }
+
+    const otherTerms = (n.terms || []).filter(t => t !== state.term);
+    if (otherTerms.length) {
+      panelBody.appendChild(el("h3", { text: "Also offered" }));
+      const sorted = [...otherTerms].sort((a, b) => termKey(b) - termKey(a));
+      panelBody.appendChild(el("div", { class: "termlist", text: sorted.join(", ") }));
     }
 
     syncURL(true);
