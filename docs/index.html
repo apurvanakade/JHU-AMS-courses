@@ -17,16 +17,8 @@
     --border-strong:  #c3c2b7;
     --edge-ink:       #898781;
     --node-selected:  #eb6834;
-
-    --lvl-1: #2a78d6; /* blue    */
-    --lvl-2: #1baf7a; /* aqua    */
-    --lvl-3: #eda100; /* yellow  */
-    --lvl-4: #008300; /* green   */
-    --lvl-5: #4a3aa7; /* violet  */
-    --lvl-6: #e34948; /* red     */
-    --lvl-7: #e87ba4; /* magenta */
-    --lvl-8: #eb6834; /* orange  */
-    --lvl-9: #898781; /* gray (fallback) */
+    --node-new:       #eda100; /* "first offered this term" ring */
+    --link:           #2a78d6;
   }
   @media (prefers-color-scheme: dark) {
     :root:where(:not([data-theme="light"])) {
@@ -41,16 +33,8 @@
       --border-strong:  #383835;
       --edge-ink:       #898781;
       --node-selected:  #d95926;
-
-      --lvl-1: #3987e5;
-      --lvl-2: #199e70;
-      --lvl-3: #c98500;
-      --lvl-4: #008300;
-      --lvl-5: #9085e9;
-      --lvl-6: #e66767;
-      --lvl-7: #d55181;
-      --lvl-8: #d95926;
-      --lvl-9: #898781;
+      --node-new:       #c98500;
+      --link:           #3987e5;
     }
   }
   :root[data-theme="dark"] {
@@ -65,16 +49,8 @@
     --border-strong:  #383835;
     --edge-ink:       #898781;
     --node-selected:  #d95926;
-
-    --lvl-1: #3987e5;
-    --lvl-2: #199e70;
-    --lvl-3: #c98500;
-    --lvl-4: #008300;
-    --lvl-5: #9085e9;
-    --lvl-6: #e66767;
-    --lvl-7: #d55181;
-    --lvl-8: #d95926;
-    --lvl-9: #898781;
+    --node-new:       #c98500;
+    --link:           #3987e5;
   }
 
   * { box-sizing: border-box; }
@@ -131,6 +107,10 @@
   .chip .swatch.dashed { background: none; border-top: 2px dashed var(--edge-ink); height: 0; }
   .chip .swatch.dotted { background: none; border-top: 2px dotted var(--edge-ink); height: 0; }
   .chip .swatch.thick { height: 3px; }
+  .chip .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: none; }
+  .legend-shape { width: 9px; height: 9px; display: inline-block; background: var(--muted); flex: none; }
+  .legend-shape.diamond { border-radius: 2px; transform: rotate(45deg); }
+  .legend-shape.ring { width: 11px; height: 11px; background: none; border-radius: 50%; border: 2px solid var(--node-new); }
 
   main { position: relative; flex: 1; min-height: 0; display: flex; }
   #canvasWrap { position: relative; flex: 1; min-width: 0; }
@@ -174,7 +154,7 @@
   #panel .desc { font-size: 12.5px; color: var(--text-secondary); white-space: pre-wrap; }
   #panel .req-line { font-size: 12.5px; margin-bottom: 6px; }
   #panel .req-line .note { color: var(--muted); font-size: 11px; display: block; }
-  #panel a.course-link { color: var(--lvl-1); text-decoration: none; cursor: pointer; }
+  #panel a.course-link { color: var(--link); text-decoration: none; cursor: pointer; }
   #panel a.course-link:hover { text-decoration: underline; }
   #panel #closePanel {
     float: right; border: none; background: none; color: var(--muted); font-size: 16px; cursor: pointer;
@@ -212,14 +192,17 @@
       <span class="label">Level</span>
       <label class="chip active" data-degree="Undergraduate">
         <input type="checkbox" checked>
+        <span class="dot" style="background:hsl(213,68%,50%)"></span>
         <span>Undergraduate</span>
       </label>
       <label class="chip" data-degree="Graduate">
         <input type="checkbox">
+        <span class="dot" style="background:hsl(152,45%,40%)"></span>
         <span>Graduate</span>
       </label>
       <label class="chip" data-degree="Independent">
         <input type="checkbox">
+        <span class="dot" style="background:hsl(262,40%,50%)"></span>
         <span>Independent study</span>
       </label>
     </div>
@@ -253,6 +236,18 @@
       <span class="chip legend-item">
         <span class="swatch thick"></span>
         <span>Equivalent</span>
+      </span>
+    </div>
+
+    <div class="filter-group" id="highlightLegend">
+      <span class="label">Highlights</span>
+      <span class="chip legend-item">
+        <span class="legend-shape ring"></span>
+        <span>New this term</span>
+      </span>
+      <span class="chip legend-item">
+        <span class="legend-shape diamond"></span>
+        <span>Fall or Spring only</span>
       </span>
     </div>
   </div>
@@ -345,6 +340,22 @@
     return n && n.title ? `${code} (${n.title})` : code;
   }
 
+  // The earliest term (in our scraped window, Fall 2023 onward) a course
+  // appears in — used to flag "first offered this term". Null for stubs
+  // (no term data of their own).
+  function firstTermOf(n) {
+    if (!n.terms.length) return null;
+    return n.terms.reduce((a, b) => (termKey(a) <= termKey(b) ? a : b));
+  }
+
+  // 'Fall' if every offering on record is a Fall term, 'Spring' if every one
+  // is Spring, null if it's offered in both (or we have no term data at all).
+  function seasonOnlyOf(n) {
+    if (!n.terms.length) return null;
+    const seasons = new Set(n.terms.map(t => t.split(" ")[0]));
+    return seasons.size === 1 ? [...seasons][0] : null;
+  }
+
   // ---------------------------------------------------------------------
   // Render model
   // ---------------------------------------------------------------------
@@ -357,6 +368,35 @@
 
   function cssVar(name) {
     return getComputedStyle(root).getPropertyValue(name).trim();
+  }
+
+  function isDarkMode() {
+    const attr = root.getAttribute("data-theme");
+    if (attr) return attr === "dark";
+    return matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+
+  // Color is keyed by degree (Undergraduate/Graduate/Independent — three
+  // hues, fixed) with an ordinal lightness ramp across the course-number
+  // column (100s lightest, 800s darkest) inside each hue, rather than a
+  // different hue per column: level and degree are two different axes, and
+  // eight distinct hues was more identity-work than the graph needed.
+  const DEGREE_HUE = {
+    Undergraduate: { h: 213, s: 68 }, // blue
+    Graduate:      { h: 152, s: 45 }, // teal-green
+    Independent:   { h: 262, s: 40 }, // violet
+  };
+
+  function nodeColor(n) {
+    if (!n.degreeLevel) return cssVar("--muted"); // stub/external course
+    const { h, s } = DEGREE_HUE[n.degreeLevel] || { h: 0, s: 0 };
+    const col = Math.min(8, Math.max(1, Number(n.col) || 5));
+    const t = (col - 1) / 7; // 0 (100s) .. 1 (800s)
+    const dark = isDarkMode();
+    const lightLo = dark ? 76 : 70; // lightness at the 100s (lightest)
+    const lightHi = dark ? 46 : 32; // lightness at the 800s (darkest)
+    const L = lightLo + (lightHi - lightLo) * t;
+    return `hsl(${h}, ${s}%, ${L}%)`;
   }
 
   let nodes = [];
@@ -374,6 +414,8 @@
       ...n,
       col: levelDigit(n.id),          // course-number column, e.g. "4" for the 400s
       degreeLevel: degreeBucket(n.level), // "Undergraduate" | "Graduate" | "Independent"
+      firstTerm: firstTermOf(n),      // earliest term on record, or null for stubs
+      seasonOnly: seasonOnlyOf(n),    // 'Fall' | 'Spring' | null (offered in both, or a stub)
       x: 0, y: 0, r: 4,
       degree: 0,
     }));
@@ -834,6 +876,8 @@
     if (n.credits) meta.appendChild(el("span", { text: n.credits + " cr" }));
     if (n.department) meta.appendChild(el("span", { text: n.department.replace(/^EN |^AS /, "") }));
     if (n.cross_listed) meta.appendChild(el("span", { text: "Cross-listed" }));
+    if (n.seasonOnly) meta.appendChild(el("span", { text: `${n.seasonOnly} only` }));
+    if (n.firstTerm === state.term) meta.appendChild(el("span", { text: "New this term" }));
     panelBody.appendChild(meta);
 
     if (n.description) {
@@ -988,21 +1032,43 @@
     const selColor = cssVar("--node-selected");
     const titleBudget = Math.max(0, Math.floor((COLUMN_WIDTH - 90) / 6));
 
+    const newRingColor = cssVar("--node-new");
+
     for (const n of nodes) {
       if (!n.visible) continue;
       const dim = (focusSet && !focusSet.has(n.id)) || (state.search && !n.matched);
       ctx.globalAlpha = dim ? 0.15 : 1;
 
-      const levelColor = cssVar(`--lvl-${n.col}`);
+      const fill = nodeColor(n);
       ctx.beginPath();
-      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-      ctx.fillStyle = n.stub ? "transparent" : levelColor;
+      if (n.seasonOnly) {
+        // Fall-only and Spring-only share one shape — every term here is
+        // either Fall or Spring, so "only one season" is a single fact;
+        // which season it is reads from the label/tooltip instead.
+        const d = n.r * 1.4; // diamond
+        ctx.moveTo(n.x, n.y - d);
+        ctx.lineTo(n.x + d, n.y);
+        ctx.lineTo(n.x, n.y + d);
+        ctx.lineTo(n.x - d, n.y);
+        ctx.closePath();
+      } else {
+        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      }
+      ctx.fillStyle = n.stub ? "transparent" : fill;
       ctx.fill();
       ctx.lineWidth = (n === selected ? 2.5 : 1.2) / camera.scale;
-      ctx.strokeStyle = n === selected ? selColor : levelColor;
+      ctx.strokeStyle = n === selected ? selColor : fill;
       if (n.stub) ctx.setLineDash([2, 2]); else ctx.setLineDash([]);
       ctx.stroke();
       ctx.setLineDash([]);
+
+      if (n.firstTerm === state.term) {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r + 3 / camera.scale, 0, Math.PI * 2);
+        ctx.strokeStyle = newRingColor;
+        ctx.lineWidth = 1.6 / camera.scale;
+        ctx.stroke();
+      }
 
       ctx.font = `${11}px system-ui, sans-serif`;
       ctx.textBaseline = "middle";
