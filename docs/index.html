@@ -213,14 +213,20 @@
       <!-- chips injected per column once data loads -->
     </div>
 
-    <div class="filter-group">
+    <div class="filter-group" id="degreeLegend">
       <span class="label">Level</span>
-      <select id="degreeFilter">
-        <option value="">All</option>
-        <option value="Undergraduate">Undergraduate</option>
-        <option value="Graduate">Graduate</option>
-        <option value="Independent">Independent study</option>
-      </select>
+      <label class="chip active" data-degree="Undergraduate">
+        <input type="checkbox" checked>
+        <span>Undergraduate</span>
+      </label>
+      <label class="chip active" data-degree="Graduate">
+        <input type="checkbox" checked>
+        <span>Graduate</span>
+      </label>
+      <label class="chip active" data-degree="Independent">
+        <input type="checkbox" checked>
+        <span>Independent study</span>
+      </label>
     </div>
 
     <div class="filter-group">
@@ -495,7 +501,7 @@
   const state = {
     search: "",
     term: "",
-    degree: "",
+    degree: new Set(["Undergraduate", "Graduate", "Independent"]),
     showStubs: true,
     edgeTypes: new Set(["prerequisite", "corequisite", "exclusion", "equivalent"]),
     levels: new Set(),
@@ -511,7 +517,10 @@
       let visible = true;
       if (!state.showStubs && n.stub) visible = false;
       if (visible && !state.levels.has(n.col)) visible = false;
-      if (visible && state.degree && n.degreeLevel !== state.degree) visible = false;
+      // n.degreeLevel is null for stub/external courses (no registrar level
+      // data) — exempt them from this filter rather than hiding them
+      // whenever any box is unchecked.
+      if (visible && n.degreeLevel && !state.degree.has(n.degreeLevel)) visible = false;
       if (visible && state.term && !n.terms.includes(state.term)) visible = false;
       if (visible && q) {
         const hay = (n.id + " " + (n.title || "")).toLowerCase();
@@ -532,8 +541,16 @@
   }
 
   document.getElementById("search").addEventListener("input", e => { state.search = e.target.value; applyFilters(); });
-  document.getElementById("degreeFilter").addEventListener("change", e => { state.degree = e.target.value; applyFilters(); });
   document.getElementById("termFilter").addEventListener("change", e => { state.term = e.target.value; applyFilters(); });
+  document.querySelectorAll("#degreeLegend .chip").forEach(chip => {
+    const degree = chip.dataset.degree;
+    const input = chip.querySelector("input");
+    input.addEventListener("change", () => {
+      if (input.checked) state.degree.add(degree); else state.degree.delete(degree);
+      chip.classList.toggle("active", input.checked);
+      applyFilters();
+    });
+  });
   document.getElementById("stubToggle").addEventListener("change", e => {
     state.showStubs = e.target.checked;
     document.getElementById("stubChip").classList.toggle("active", state.showStubs);
