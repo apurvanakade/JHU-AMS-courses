@@ -557,6 +557,11 @@ def build_graph(courses: dict[str, dict]) -> dict:
             "stub": c["stub"],
             "prerequisites": prereq_trees,
             "corequisites": coreq_trees,
+            "sections": [
+                {"term": term, "section": section, "instructors": list(instructors),
+                 "syllabus_url": syllabus_url or None}
+                for term, section, instructors, syllabus_url in c["sections"]
+            ],
         })
 
     seen_pairs = set()

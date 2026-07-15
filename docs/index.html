@@ -167,6 +167,9 @@
   }
   #panel .empty { color: var(--muted); font-size: 12.5px; }
   #panel .termlist { font-size: 12px; color: var(--text-secondary); }
+  #panel .sectionlist { font-size: 12px; color: var(--text-secondary); }
+  #panel .section-row { margin-bottom: 4px; }
+  #panel .section-term { color: var(--text-primary); font-weight: 600; }
 
   #loading, #loadError {
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
@@ -972,7 +975,27 @@
       panelBody.appendChild(list);
     }
 
-    if (n.terms && n.terms.length) {
+    if (n.sections && n.sections.length) {
+      panelBody.appendChild(el("h3", { text: "Sections" }));
+      const list = el("div", { class: "sectionlist" });
+      const sorted = [...n.sections].sort((a, b) => termKey(b.term) - termKey(a.term));
+      for (const s of sorted) {
+        const row = el("div", { class: "section-row" });
+        row.appendChild(el("span", { class: "section-term", text: `${s.term} · ${s.section}` }));
+        if (s.instructors && s.instructors.length) {
+          row.appendChild(document.createTextNode(" — " + s.instructors.join(", ")));
+        }
+        if (s.syllabus_url) {
+          row.appendChild(document.createTextNode(" "));
+          row.appendChild(el("a", {
+            class: "course-link", text: "Syllabus",
+            href: s.syllabus_url, target: "_blank", rel: "noopener noreferrer",
+          }));
+        }
+        list.appendChild(row);
+      }
+      panelBody.appendChild(list);
+    } else if (n.terms && n.terms.length) {
       panelBody.appendChild(el("h3", { text: "Terms offered" }));
       panelBody.appendChild(el("div", { class: "termlist", text: n.terms.join(", ") }));
     }

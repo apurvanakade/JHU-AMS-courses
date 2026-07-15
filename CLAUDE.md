@@ -115,8 +115,9 @@ Two outputs, both fully reproducible by re-running the script:
   different people — that data doesn't collapse to one row per course the
   way everything else does.
 - `docs/graph.json` (committed) — a nodes/edges flattening of the same data
-  for `docs/index.html` to fetch directly; no server-side build step.
-  Course-level only — it does not carry `course_sections` data.
+  for `docs/index.html` to fetch directly; no server-side build step. Each
+  node's `sections` array mirrors `course_sections` (term, section,
+  instructors, syllabus_url) for the visualizer's detail panel.
 
 ## docs/ (the visualizer)
 
