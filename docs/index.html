@@ -209,8 +209,18 @@
     </div>
 
     <div class="filter-group" id="levelLegend">
+      <span class="label">Course #</span>
+      <!-- chips injected per column once data loads -->
+    </div>
+
+    <div class="filter-group">
       <span class="label">Level</span>
-      <!-- chips injected per level once data loads -->
+      <select id="degreeFilter">
+        <option value="">All</option>
+        <option value="Undergraduate">Undergraduate</option>
+        <option value="Graduate">Graduate</option>
+        <option value="Independent">Independent study</option>
+      </select>
     </div>
 
     <div class="filter-group">
@@ -325,6 +335,16 @@
     6: "600s", 7: "700s", 8: "800s", 9: "other",
   };
 
+  // the registrar's own coarse level string (e.g. "Upper Level Undergraduate",
+  // "Graduate Independent Academic Work") bucketed into the three groups the
+  // old dropdown used.
+  function degreeBucket(level) {
+    if (!level) return null;
+    if (level.includes("Independent")) return "Independent";
+    if (level.includes("Graduate")) return "Graduate";
+    return "Undergraduate";
+  }
+
   function courseLabel(code) {
     const n = nodeById.get(code);
     return n && n.title ? `${code} (${n.title})` : code;
@@ -357,7 +377,8 @@
     nodeById = new Map();
     nodes = g.nodes.map(n => ({
       ...n,
-      level: levelDigit(n.id),
+      col: levelDigit(n.id),          // course-number column, e.g. "4" for the 400s
+      degreeLevel: degreeBucket(n.level), // "Undergraduate" | "Graduate" | "Independent"
       x: 0, y: 0,
       degree: 0,
     }));
@@ -393,8 +414,8 @@
   function layoutStatic() {
     const columns = new Map();
     for (const n of nodes) {
-      if (!columns.has(n.level)) columns.set(n.level, []);
-      columns.get(n.level).push(n);
+      if (!columns.has(n.col)) columns.set(n.col, []);
+      columns.get(n.col).push(n);
     }
     allLevels = Array.from(columns.keys()).sort((a, b) => Number(a) - Number(b));
     for (const lvl of allLevels) columns.get(lvl).sort((a, b) => a.id.localeCompare(b.id));
@@ -474,6 +495,7 @@
   const state = {
     search: "",
     term: "",
+    degree: "",
     showStubs: true,
     edgeTypes: new Set(["prerequisite", "corequisite", "exclusion", "equivalent"]),
     levels: new Set(),
@@ -488,7 +510,8 @@
     for (const n of nodes) {
       let visible = true;
       if (!state.showStubs && n.stub) visible = false;
-      if (visible && !state.levels.has(n.level)) visible = false;
+      if (visible && !state.levels.has(n.col)) visible = false;
+      if (visible && state.degree && n.degreeLevel !== state.degree) visible = false;
       if (visible && state.term && !n.terms.includes(state.term)) visible = false;
       if (visible && q) {
         const hay = (n.id + " " + (n.title || "")).toLowerCase();
@@ -509,6 +532,7 @@
   }
 
   document.getElementById("search").addEventListener("input", e => { state.search = e.target.value; applyFilters(); });
+  document.getElementById("degreeFilter").addEventListener("change", e => { state.degree = e.target.value; applyFilters(); });
   document.getElementById("termFilter").addEventListener("change", e => { state.term = e.target.value; applyFilters(); });
   document.getElementById("stubToggle").addEventListener("change", e => {
     state.showStubs = e.target.checked;
@@ -734,7 +758,8 @@
     panelBody.appendChild(el("div", { class: "title", text: n.title || (n.stub ? "Referenced course (outside AMS scrape scope)" : "") }));
 
     const meta = el("div", { class: "meta" });
-    if (n.level) meta.appendChild(el("span", { text: LEVEL_LABEL[n.level] || n.level }));
+    if (n.col) meta.appendChild(el("span", { text: LEVEL_LABEL[n.col] || n.col }));
+    if (n.level) meta.appendChild(el("span", { text: n.level }));
     if (n.credits) meta.appendChild(el("span", { text: n.credits + " cr" }));
     if (n.department) meta.appendChild(el("span", { text: n.department.replace(/^EN |^AS /, "") }));
     if (n.cross_listed) meta.appendChild(el("span", { text: "Cross-listed" }));
@@ -834,7 +859,7 @@
       const s = e.source, t = e.target;
 
       ctx.beginPath();
-      if (s.level === t.level) {
+      if (s.col === t.col) {
         const bulge = 26 + Math.abs(s.y - t.y) * 0.12;
         const midY = (s.y + t.y) / 2;
         ctx.moveTo(s.x, s.y);
@@ -881,7 +906,7 @@
       const dim = (focusSet && !focusSet.has(n.id)) || (state.search && !n.matched);
       ctx.globalAlpha = dim ? 0.15 : 1;
 
-      const levelColor = cssVar(`--lvl-${n.level}`);
+      const levelColor = cssVar(`--lvl-${n.col}`);
       ctx.beginPath();
       ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
       ctx.fillStyle = n.stub ? "transparent" : levelColor;
