@@ -416,15 +416,12 @@
       firstTerm: firstTermOf(n),      // earliest term on record, or null for stubs
       seasonOnly: seasonOnlyOf(n),    // 'Fall' | 'Spring' | null (offered in both, or a stub)
       x: 0, y: 0, r: 4,
-      degree: 0,
     }));
     nodes.forEach(n => nodeById.set(n.id, n));
 
     edges = g.edges
       .filter(e => nodeById.has(e.source) && nodeById.has(e.target))
       .map(e => ({ ...e, source: nodeById.get(e.source), target: nodeById.get(e.target) }));
-    edges.forEach(e => { e.source.degree++; e.target.degree++; });
-    nodes.forEach(n => { n.r = Math.max(3, Math.min(7, 3 + Math.sqrt(n.degree))); });
 
     allTerms = Array.from(new Set(nodes.flatMap(n => n.terms))).sort((a, b) => termKey(a) - termKey(b));
     const termSelect = document.getElementById("termFilter");
@@ -623,6 +620,21 @@
       if (q && visible) { matchCount++; matchedNode = n; }
     }
     activeEdges = edges.filter(e => e.source.visible && e.target.visible);
+
+    // Node radius = how many currently-visible courses require this one as
+    // a prerequisite (outgoing "prerequisite" edges only — not corequisite/
+    // exclusion/equivalent, and not incoming edges). Recomputed on every
+    // filter change since the count only makes sense against what's
+    // actually on screen right now.
+    const outCount = new Map();
+    for (const e of activeEdges) {
+      if (e.type !== "prerequisite") continue;
+      outCount.set(e.source.id, (outCount.get(e.source.id) || 0) + 1);
+    }
+    for (const n of nodes) {
+      n.r = Math.max(3, Math.min(7, 3 + Math.sqrt(outCount.get(n.id) || 0)));
+    }
+
     const shown = nodes.filter(n => n.visible).length;
     statusEl.textContent = `${shown} course${shown === 1 ? "" : "s"} · ${activeEdges.length} connection${activeEdges.length === 1 ? "" : "s"}`;
 
