@@ -33,6 +33,13 @@ AS.110.202 Calculus III, outside the AMS department scope of this repo's
 scraper) get a "stub" node, titled from `PrereqCoursesCatalogs` when
 available, so prerequisite edges always resolve to a real node.
 
+500-level, 800-level, and "Independent Academic Work" sections (JHU's own
+label for independent-study arrangements) are dropped entirely before
+being collapsed into `courses` — see `is_excluded()`. These are one-off
+student/faculty arrangements, not real courses, and nothing else in the
+scraped data references them as a prerequisite/corequisite/equivalency, so
+excluding them doesn't leave any dangling stub nodes behind.
+
 Usage:
     python3 build_database.py              # reads data/, writes db/ + docs/graph.json
     python3 build_database.py --data-dir data --db-dir db --docs-dir docs
@@ -154,6 +161,18 @@ def most_common(values) -> str | None:
     return Counter(values).most_common(1)[0][0]
 
 
+def is_excluded(rec: dict) -> bool:
+    """500-level, 800-level, and "Independent Academic Work" sections are
+    one-off arrangements between a student and a faculty sponsor rather than
+    real courses to route through — they clutter the graph with barely
+    connected nodes for no navigational benefit, so they're dropped before
+    ever entering `courses`."""
+    number = rec.get("OfferingName", "").rpartition(".")[2]
+    if number[:1] in ("5", "8"):
+        return True
+    return "Independent Academic Work" in (rec.get("Level") or "")
+
+
 def build_courses(term_files: list[tuple[str, list[dict]]]) -> dict[str, dict]:
     """Collapse every section record down to one row per course code."""
     by_code: dict[str, dict] = defaultdict(lambda: {
@@ -171,6 +190,8 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> dict[str, dict]:
 
     for _path, records in term_files:
         for rec in records:
+            if is_excluded(rec):
+                continue
             code = rec["OfferingName"]
             row = by_code[code]
             row["titles"].append(rec.get("Title"))

@@ -75,6 +75,10 @@ records into one row per course, extracting:
   in this data, never a true corequisite)
 - **Equivalencies** — cross-numbering, e.g. `EN.550.310` ≡ `EN.553.311`
 
+500-level, 800-level, and "Independent Academic Work" sections (JHU's label
+for independent-study arrangements) are excluded — one-off student/faculty
+arrangements, not real courses worth showing in the graph.
+
 Writes two outputs, both fully reproducible by re-running the script:
 
 - `db/courses.db` (SQLite, gitignored) — the queryable source of truth

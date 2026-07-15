@@ -103,6 +103,14 @@ Courses referenced only as a prerequisite (e.g. `AS.110.202` Calculus III,
 outside this repo's AMS scrape scope) get a stub node, titled from JHU's own
 `PrereqCoursesCatalogs` metadata when available.
 
+500-level, 800-level, and "Independent Academic Work"-level sections (JHU's
+label for independent-study arrangements) are dropped before they're
+collapsed into a course row (`is_excluded()`) — these are one-off
+student/faculty arrangements, not real courses, and add nodes to the graph
+with little to no navigational value. Nothing else in the scraped data
+references them as a prerequisite/corequisite/equivalency, so dropping them
+doesn't leave dangling stub nodes behind.
+
 Two outputs, both fully reproducible by re-running the script:
 - `db/courses.db` (SQLite, gitignored) — the queryable source of truth,
   with prerequisite/corequisite logic stored as a tree via `parent_id`
