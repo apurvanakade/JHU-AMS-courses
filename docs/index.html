@@ -110,7 +110,6 @@
   .chip .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: none; }
   .legend-shape { width: 9px; height: 9px; display: inline-block; background: var(--muted); flex: none; }
   .legend-shape.diamond { border-radius: 2px; transform: rotate(45deg); }
-  .legend-shape.ring { width: 11px; height: 11px; background: none; border-radius: 50%; border: 2px solid var(--node-new); }
 
   main { position: relative; flex: 1; min-height: 0; display: flex; }
   #canvasWrap { position: relative; flex: 1; min-width: 0; }
@@ -242,7 +241,7 @@
     <div class="filter-group" id="highlightLegend">
       <span class="label">Highlights</span>
       <span class="chip legend-item">
-        <span class="legend-shape ring"></span>
+        <span class="dot" style="background:var(--node-new)"></span>
         <span>New this term</span>
       </span>
       <span class="chip legend-item">
@@ -756,6 +755,8 @@
     if (clickedNode) {
       if (clickedNode === selected) deselect();
       else selectNode(clickedNode);
+    } else if (!moved && selected) {
+      deselect(); // clicking empty background clears the current focus
     }
   });
   canvas.addEventListener("pointerleave", () => { hideTooltip(); draw(); });
@@ -876,8 +877,9 @@
     if (n.credits) meta.appendChild(el("span", { text: n.credits + " cr" }));
     if (n.department) meta.appendChild(el("span", { text: n.department.replace(/^EN |^AS /, "") }));
     if (n.cross_listed) meta.appendChild(el("span", { text: "Cross-listed" }));
-    if (n.seasonOnly) meta.appendChild(el("span", { text: `${n.seasonOnly} only` }));
-    if (n.firstTerm === state.term) meta.appendChild(el("span", { text: "New this term" }));
+    const isNew = n.firstTerm === state.term;
+    if (n.seasonOnly && !isNew) meta.appendChild(el("span", { text: `${n.seasonOnly} only` }));
+    if (isNew) meta.appendChild(el("span", { text: "New this term" }));
     panelBody.appendChild(meta);
 
     if (n.description) {
@@ -1032,16 +1034,21 @@
     const selColor = cssVar("--node-selected");
     const titleBudget = Math.max(0, Math.floor((COLUMN_WIDTH - 90) / 6));
 
-    const newRingColor = cssVar("--node-new");
+    const newColor = cssVar("--node-new");
 
     for (const n of nodes) {
       if (!n.visible) continue;
       const dim = (focusSet && !focusSet.has(n.id)) || (state.search && !n.matched);
       ctx.globalAlpha = dim ? 0.15 : 1;
 
-      const fill = nodeColor(n);
+      // A course new this term has, by definition, only one term on
+      // record so far — "only offered in Fall/Spring" isn't a pattern yet,
+      // just an artifact of it being new. So it never gets the diamond,
+      // and gets a distinct fill instead of its usual degree color.
+      const isNew = n.firstTerm === state.term;
+      const fill = isNew ? newColor : nodeColor(n);
       ctx.beginPath();
-      if (n.seasonOnly) {
+      if (n.seasonOnly && !isNew) {
         // Fall-only and Spring-only share one shape — every term here is
         // either Fall or Spring, so "only one season" is a single fact;
         // which season it is reads from the label/tooltip instead.
@@ -1061,14 +1068,6 @@
       if (n.stub) ctx.setLineDash([2, 2]); else ctx.setLineDash([]);
       ctx.stroke();
       ctx.setLineDash([]);
-
-      if (n.firstTerm === state.term) {
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, n.r + 3 / camera.scale, 0, Math.PI * 2);
-        ctx.strokeStyle = newRingColor;
-        ctx.lineWidth = 1.6 / camera.scale;
-        ctx.stroke();
-      }
 
       ctx.font = `${11}px system-ui, sans-serif`;
       ctx.textBaseline = "middle";
