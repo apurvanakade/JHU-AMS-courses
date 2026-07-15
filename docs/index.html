@@ -167,9 +167,18 @@
   }
   #panel .empty { color: var(--muted); font-size: 12.5px; }
   #panel .termlist { font-size: 12px; color: var(--text-secondary); }
-  #panel .sectionlist { font-size: 12px; color: var(--text-secondary); }
-  #panel .section-row { margin-bottom: 4px; }
-  #panel .section-term { color: var(--text-primary); font-weight: 600; }
+  #panel .table-scroll { overflow-x: auto; }
+  #panel table.sections { width: 100%; min-width: 420px; border-collapse: collapse; font-size: 12px; }
+  #panel table.sections th, #panel table.sections td {
+    text-align: left; padding: 3px 6px 3px 0; border-bottom: 1px solid var(--border);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px;
+  }
+  #panel table.sections th {
+    color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 10.5px; letter-spacing: .03em;
+  }
+  #panel table.sections td { color: var(--text-secondary); }
+  #panel table.sections td.section-term { color: var(--text-primary); font-weight: 600; white-space: normal; }
+  #panel table.sections td.section-instructors { white-space: normal; }
 
   #loading, #loadError {
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
@@ -977,24 +986,32 @@
 
     if (n.sections && n.sections.length) {
       panelBody.appendChild(el("h3", { text: "Sections" }));
-      const list = el("div", { class: "sectionlist" });
+      const table = el("table", { class: "sections" });
+      const thead = el("tr");
+      for (const h of ["Term", "Sec", "Instructor(s)", "Seats", "Status", ""]) {
+        thead.appendChild(el("th", { text: h }));
+      }
+      table.appendChild(thead);
       const sorted = [...n.sections].sort((a, b) => termKey(b.term) - termKey(a.term));
       for (const s of sorted) {
-        const row = el("div", { class: "section-row" });
-        row.appendChild(el("span", { class: "section-term", text: `${s.term} · ${s.section}` }));
-        if (s.instructors && s.instructors.length) {
-          row.appendChild(document.createTextNode(" — " + s.instructors.join(", ")));
-        }
+        const row = el("tr");
+        row.appendChild(el("td", { class: "section-term", text: s.term }));
+        row.appendChild(el("td", { text: s.section || "" }));
+        row.appendChild(el("td", { class: "section-instructors", text: (s.instructors || []).join(", ") }));
+        row.appendChild(el("td", { text: s.seats_available || "" }));
+        row.appendChild(el("td", { text: s.status || "" }));
+        const linkCell = el("td");
         if (s.syllabus_url) {
-          row.appendChild(document.createTextNode(" "));
-          row.appendChild(el("a", {
+          linkCell.appendChild(el("a", {
             class: "course-link", text: "Syllabus",
             href: s.syllabus_url, target: "_blank", rel: "noopener noreferrer",
           }));
         }
-        list.appendChild(row);
+        row.appendChild(linkCell);
+        table.appendChild(row);
       }
-      panelBody.appendChild(list);
+      const scroll = el("div", { class: "table-scroll" }, [table]);
+      panelBody.appendChild(scroll);
     } else if (n.terms && n.terms.length) {
       panelBody.appendChild(el("h3", { text: "Terms offered" }));
       panelBody.appendChild(el("div", { class: "termlist", text: n.terms.join(", ") }));

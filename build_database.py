@@ -160,7 +160,8 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> dict[str, dict]:
         "levels": [], "credits": [], "all_departments": set(),
         "areas": set(), "pos_tags": set(), "cross_listed": set(),
         "terms": set(),
-        "sections": [],     # list of (term, section, instructors, syllabus_url)
+        "sections": [],     # list of (term, section, instructors, syllabus_url,
+                            #           max_seats, seats_available, waitlisted, status)
         "prereq_raw": [],   # list of (expression, description, is_negative)
         "coreq_raw": [],    # list of (expression, description)
         "equivalent_to": set(),
@@ -185,6 +186,10 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> dict[str, dict]:
                 rec.get("SectionName"),
                 tuple(rec.get("InstructorsDelimited") or []),
                 rec.get("Syllabus_Url"),
+                rec.get("MaxSeats"),
+                rec.get("SeatsAvailable"),
+                rec.get("Waitlisted"),
+                rec.get("Status"),
             ))
 
             for area in rec.get("Areas") or []:
@@ -315,6 +320,10 @@ CREATE TABLE course_sections (
     section TEXT,
     instructors TEXT,       -- JSON array of full names, e.g. "Miller, John C"
     syllabus_url TEXT,
+    max_seats TEXT,         -- raw JHU field, e.g. "60" or "N/A"
+    seats_available TEXT,   -- raw JHU field, e.g. "45/60"
+    waitlisted TEXT,        -- raw JHU field, e.g. "0" or "N/A"
+    status TEXT,            -- e.g. "Open", "Waitlist Only", "Approval Required"
     PRIMARY KEY (code, term, section)
 );
 
@@ -372,11 +381,12 @@ def build_database(courses: dict[str, dict], db_path: str) -> None:
         for term in c["terms"]:
             cur.execute("INSERT INTO course_terms (code, term) VALUES (?, ?)", (code, term))
 
-        for term, section, instructors, syllabus_url in c["sections"]:
+        for term, section, instructors, syllabus_url, max_seats, seats_available, waitlisted, status in c["sections"]:
             cur.execute(
-                "INSERT INTO course_sections (code, term, section, instructors, syllabus_url) "
-                "VALUES (?, ?, ?, ?, ?)",
-                (code, term, section, json.dumps(list(instructors)), syllabus_url),
+                "INSERT INTO course_sections (code, term, section, instructors, syllabus_url, "
+                "max_seats, seats_available, waitlisted, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (code, term, section, json.dumps(list(instructors)), syllabus_url,
+                 max_seats, seats_available, waitlisted, status),
             )
 
         for expression, description, is_negative in c["prereq_raw"]:
@@ -559,8 +569,11 @@ def build_graph(courses: dict[str, dict]) -> dict:
             "corequisites": coreq_trees,
             "sections": [
                 {"term": term, "section": section, "instructors": list(instructors),
-                 "syllabus_url": syllabus_url or None}
-                for term, section, instructors, syllabus_url in c["sections"]
+                 "syllabus_url": syllabus_url or None, "max_seats": max_seats or None,
+                 "seats_available": seats_available or None, "waitlisted": waitlisted or None,
+                 "status": status or None}
+                for term, section, instructors, syllabus_url, max_seats, seats_available,
+                    waitlisted, status in c["sections"]
             ],
         })
 

@@ -110,14 +110,15 @@ Two outputs, both fully reproducible by re-running the script:
   tables (`courses`, `prereq_nodes`, `corequisite_nodes`, `equivalencies`)
   hold one row per course, since that's the collapsed unit the rest of the
   script works with. `course_sections` is the exception: it keeps one row
-  per actual section per term (`instructors`, `syllabus_url`) because a
-  single course can have many sections in the same term taught by
-  different people — that data doesn't collapse to one row per course the
-  way everything else does.
+  per actual section per term (`instructors`, `syllabus_url`, `max_seats`,
+  `seats_available`, `waitlisted`, `status`) because a single course can
+  have many sections in the same term taught by different people — that
+  data doesn't collapse to one row per course the way everything else does.
 - `docs/graph.json` (committed) — a nodes/edges flattening of the same data
   for `docs/index.html` to fetch directly; no server-side build step. Each
   node's `sections` array mirrors `course_sections` (term, section,
-  instructors, syllabus_url) for the visualizer's detail panel.
+  instructors, syllabus_url, enrollment) and is rendered as a per-section
+  table in the visualizer's detail panel.
 
 ## docs/ (the visualizer)
 
