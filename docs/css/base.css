@@ -1,0 +1,14 @@
+/* Page reset and the top-level app shell layout. */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; height: 100%;
+  background: var(--page-plane);
+  color: var(--text-primary);
+  font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.app { display: flex; flex-direction: column; height: 100vh; }
+
+main { position: relative; flex: 1; min-height: 0; display: flex; }

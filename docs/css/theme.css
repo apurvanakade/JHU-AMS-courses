@@ -1,0 +1,52 @@
+/* Color tokens: light default, dark via prefers-color-scheme, and an
+   explicit override via [data-theme] for the in-page toggle button. */
+
+:root {
+  color-scheme: light;
+  --surface-1:      #fcfcfb;
+  --page-plane:     #f9f9f7;
+  --text-primary:   #0b0b0b;
+  --text-secondary: #52514e;
+  --muted:          #898781;
+  --gridline:       #e1e0d9;
+  --border:         rgba(11,11,11,0.10);
+  --border-strong:  #c3c2b7;
+  --edge-ink:       #898781;
+  --node-selected:  #eb6834;
+  --node-new:       #eda100; /* "first offered this term" ring */
+  --link:           #2a78d6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --muted:          #898781;
+    --gridline:       #2c2c2a;
+    --border:         rgba(255,255,255,0.10);
+    --border-strong:  #383835;
+    --edge-ink:       #898781;
+    --node-selected:  #d95926;
+    --node-new:       #c98500;
+    --link:           #3987e5;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-1:      #1a1a19;
+  --page-plane:     #0d0d0d;
+  --text-primary:   #ffffff;
+  --text-secondary: #c3c2b7;
+  --muted:          #898781;
+  --gridline:       #2c2c2a;
+  --border:         rgba(255,255,255,0.10);
+  --border-strong:  #383835;
+  --edge-ink:       #898781;
+  --node-selected:  #d95926;
+  --node-new:       #c98500;
+  --link:           #3987e5;
+}

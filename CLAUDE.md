@@ -134,17 +134,51 @@ Two outputs, both fully reproducible by re-running the script:
 
 ## docs/ (the visualizer)
 
-`docs/index.html` is a single self-contained file (no dependencies, no
-build step) that fetches `graph.json` and renders it as a **static**
-layout: one column per course level (the course number's hundreds digit,
-so `EN.553.310` sits in the "300s" column), ordered top-to-bottom within
-each column by a one-time barycenter sweep against connected courses to
-reduce crossings. Node fill color encodes level (categorical, one hue per
-column); edge dash pattern encodes relationship type (solid+arrow =
-prerequisite, dotted = corequisite/can't-combine, dashed = mutually
-exclusive, thick solid = equivalent). There is no physics simulation —
-positions are computed once at load and never move on their own; the only
-interactivity is pan/zoom/click.
+`docs/index.html` is a thin HTML shell — `docs/css/*.css` and
+`docs/js/*.js` hold the actual styling and logic. There is still no build
+step: the CSS files are plain `<link>` stylesheets and the JS files are
+native ES modules (`docs/js/main.js` loaded via `<script type="module">`),
+so nothing needs `npm`/bundling to run — serving `docs/` over `http://`
+(see Commands above) is enough.
+
+- `docs/css/theme.css` — light/dark color tokens (custom properties).
+- `docs/css/base.css` — reset and the top-level flex shell.
+- `docs/css/header.css` — title bar and the filter/legend row.
+- `docs/css/graph.css` — canvas, tooltip, hint/status overlays.
+- `docs/css/panel.css` — the course detail side panel and its section table.
+- `docs/css/loading.css` — the loading/error states shown over the canvas.
+- `docs/js/constants.js` / `course-utils.js` — static lookup tables and pure
+  term/course-code helpers with no shared state.
+- `docs/js/store.js` — the one shared mutable state object (loaded graph,
+  camera, current filters, hover/selection/search focus) that every other
+  module reads and writes through, plus `buildFromGraph()` which populates
+  it from a freshly-fetched `graph.json`.
+- `docs/js/layout.js` — the static layered layout (see below).
+- `docs/js/camera.js` — pan/zoom/resize and the canvas pointer/wheel wiring.
+- `docs/js/render.js` — `draw()`, the only thing that touches the canvas
+  2D context.
+- `docs/js/tooltip.js` — the hover tooltip.
+- `docs/js/panel.js` — the detail side panel's DOM and its resize handle.
+- `docs/js/filters.js` — filter state, the URL query-string round-trip, and
+  the filter controls' DOM wiring.
+- `docs/js/main.js` — entry point; wires the modules together and drives
+  the initial `graph.json` fetch.
+
+Modules avoid circular imports by passing callbacks at init time rather
+than importing each other directly where a cycle would otherwise form
+(e.g. `panel.js` takes an `onSelectionChange` callback instead of importing
+`filters.js`'s URL-sync function).
+
+The visualizer renders the graph as a **static** layout: one column per
+course level (the course number's hundreds digit, so `EN.553.310` sits in
+the "300s" column), ordered top-to-bottom within each column by a one-time
+barycenter sweep against connected courses to reduce crossings. Node fill
+color encodes level (categorical, one hue per column); edge dash pattern
+encodes relationship type (solid+arrow = prerequisite, dotted =
+corequisite/can't-combine, dashed = mutually exclusive, thick solid =
+equivalent). There is no physics simulation — positions are computed once
+at load and never move on their own; the only interactivity is
+pan/zoom/click.
 
 This folder doubles as the GitHub Pages source (repo Settings → Pages →
 Deploy from branch → `/docs`), so `graph.json` must stay committed even
