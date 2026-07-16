@@ -28,10 +28,13 @@ Two outputs are written:
   addition to the flattened `edges` list, so a consumer can render a simple
   graph or the exact logic.
 
-Courses referenced as prerequisites but never scraped themselves (e.g.
-AS.110.202 Calculus III, outside the AMS department scope of this repo's
-scraper) get a "stub" node, titled from `PrereqCoursesCatalogs` when
-available, so prerequisite edges always resolve to a real node.
+Only `EN.553.*` codes are real AMS courses. Any other code referenced as a
+prerequisite/corequisite/equivalency of an AMS course (e.g. AS.110.202
+Calculus III, or a cross-listed EN.500/EN.601 course pulled in by
+`AllDepartments` matching) gets a "stub" node instead of a full one, titled
+from `PrereqCoursesCatalogs` or its own scraped title when available — even
+if it was scraped as its own record, so prerequisite edges always resolve
+to a node without treating non-AMS courses as first-class.
 
 500-level, 800-level, and "Independent Academic Work" sections (JHU's own
 label for independent-study arrangements) are dropped entirely before
@@ -239,8 +242,14 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> dict[str, dict]:
                 if name and title:
                     row["pcc_titles"][name] = title
 
+    # Only EN.553.* is a real AMS course number; everything else (e.g. a
+    # cross-listed EN.500 or EN.601 course pulled in via AllDepartments
+    # matching) is external and gets nothing more than a stub, regardless of
+    # whether it happened to be scraped as its own record.
     courses = {}
     for code, row in by_code.items():
+        if not code.startswith("EN.553."):
+            continue
         courses[code] = {
             "code": code,
             "title": most_common(row["titles"]),
@@ -261,15 +270,32 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> dict[str, dict]:
             "stub": False,
         }
 
-    # External-title map: courses referenced as a prereq/coreq but never
-    # scraped as their own record (out of this repo's department scope).
+    # External-title map: courses referenced as a prereq/coreq of an AMS
+    # course but never real AMS courses themselves (out of department
+    # scope). Prefer JHU's own PrereqCoursesCatalogs title; fall back to a
+    # scraped title if the external course happened to be scraped directly
+    # (e.g. cross-listed EN.500.113).
     external_titles: dict[str, str] = {}
-    for row in by_code.values():
-        for code, title in row["pcc_titles"].items():
+    for code, row in by_code.items():
+        if not code.startswith("EN.553."):
+            continue
+        for pcc_code, title in row["pcc_titles"].items():
+            external_titles.setdefault(pcc_code, title)
+    for code, row in by_code.items():
+        if code.startswith("EN.553."):
+            continue
+        title = most_common(row["titles"])
+        if title:
             external_titles.setdefault(code, title)
 
+    # Only AMS courses' own prerequisite/corequisite/equivalency data
+    # defines which external courses are worth a stub node — an external
+    # course's own prereqs (e.g. EN.500.113's mutual-exclusion with other
+    # EN.500 sections) aren't part of the AMS graph.
     referenced = set()
-    for row in by_code.values():
+    for code, row in by_code.items():
+        if not code.startswith("EN.553."):
+            continue
         for expr, _desc, _neg in row["prereq_raw"]:
             if expr:
                 referenced |= referenced_courses(parse_expression(expr))

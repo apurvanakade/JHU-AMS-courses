@@ -99,9 +99,13 @@ into one row per course, extracting the relationships between courses:
 - **Equivalencies** — cross-numbering, e.g. `EN.550.310` ≡ `EN.553.311`
   (the department was renumbered from 550 to 553 at some point).
 
-Courses referenced only as a prerequisite (e.g. `AS.110.202` Calculus III,
-outside this repo's AMS scrape scope) get a stub node, titled from JHU's own
-`PrereqCoursesCatalogs` metadata when available.
+Only `EN.553.*` codes count as real AMS courses. Any other code referenced
+as a prerequisite/corequisite/equivalency of an AMS course (e.g.
+`AS.110.202` Calculus III, or a cross-listed `EN.500`/`EN.601` course pulled
+in via `AllDepartments` matching) gets a stub node instead of a full one,
+titled from JHU's own `PrereqCoursesCatalogs` metadata or its own scraped
+title when available — even if it was scraped as its own record, so it's
+never treated as a first-class AMS course.
 
 500-level, 800-level, and "Independent Academic Work"-level sections (JHU's
 label for independent-study arrangements) are dropped before they're
