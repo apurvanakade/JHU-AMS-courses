@@ -2,7 +2,7 @@
    and the overlay bits anchored on top of it (hint, status, tooltip). */
 
 #canvasWrap { position: relative; flex: 1; min-width: 0; }
-canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+canvas { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
 canvas.dragging { cursor: grabbing; }
 
 #hint {

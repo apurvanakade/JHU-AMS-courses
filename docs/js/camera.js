@@ -11,6 +11,17 @@ let panning = false;
 let panStart = null;
 let lastPointer = { x: 0, y: 0 };
 
+// Touch pinch-to-zoom. `canvas` has `touch-action: none` (graph.css) so the
+// browser never applies its own page-zoom gesture here — that native zoom
+// only rescales the DOM (crisp) while leaving the canvas's rasterized
+// bitmap stretched, which visibly desyncs the graph from the rest of the
+// page. We track up to two active touch points ourselves instead and
+// reproduce zoom-to-midpoint the same way the wheel handler zooms to the
+// cursor.
+const activePointers = new Map();
+let pinch = null; // { dist, scale, mx, my, camX, camY } while 2 touches are down
+let suppressClick = false; // set once a pinch ends, so lifting the second finger doesn't register as a tap
+
 export function resizeCanvas() {
   const rect = wrap.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
@@ -79,39 +90,101 @@ export function initCamera(canvasEl, wrapEl, onClick) {
   window.addEventListener("resize", () => { resizeCanvas(); draw(); });
   document.getElementById("fitBtn").addEventListener("click", () => { fitToScreen(); draw(); });
 
-  canvas.addEventListener("pointerdown", e => {
-    lastPointer = { x: e.clientX, y: e.clientY };
+  function beginPan(x, y) {
+    lastPointer = { x, y };
     panning = true;
-    panStart = { x: store.camera.x, y: store.camera.y, px: e.clientX, py: e.clientY };
+    panStart = { x: store.camera.x, y: store.camera.y, px: x, py: y };
     canvas.classList.add("dragging");
+  }
+
+  canvas.addEventListener("pointerdown", e => {
+    if (activePointers.size >= 2) return; // ignore a third touch point
     canvas.setPointerCapture(e.pointerId);
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (activePointers.size === 2) {
+      panning = false;
+      const [a, b] = [...activePointers.values()];
+      const rect = canvas.getBoundingClientRect();
+      const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      pinch = {
+        dist: Math.hypot(a.x - b.x, a.y - b.y) || 1,
+        scale: store.camera.scale,
+        mx: mid.x - rect.left,
+        my: mid.y - rect.top,
+        camX: store.camera.x,
+        camY: store.camera.y,
+      };
+      hideTooltip();
+    } else {
+      beginPan(e.clientX, e.clientY);
+    }
   });
 
   canvas.addEventListener("pointermove", e => {
+    if (!activePointers.has(e.pointerId)) {
+      // Hover-only move (mouse, no button down) — never went through pointerdown.
+      const n = nodeAt(e.clientX, e.clientY);
+      const changed = n !== store.hovered;
+      store.hovered = n;
+      if (n) showTooltip(n, e.clientX, e.clientY); else hideTooltip();
+      if (changed) draw();
+      return;
+    }
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pinch && activePointers.size === 2) {
+      const [a, b] = [...activePointers.values()];
+      const rect = canvas.getBoundingClientRect();
+      const dist = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+      const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      store.camera.scale = Math.min(4, Math.max(0.08, pinch.scale * (dist / pinch.dist)));
+      store.camera.x = pinch.camX + (mid.x - rect.left - pinch.mx);
+      store.camera.y = pinch.camY + (mid.y - rect.top - pinch.my);
+      draw();
+      return;
+    }
+
     if (panning && (Math.abs(e.clientX - lastPointer.x) > 2 || Math.abs(e.clientY - lastPointer.y) > 2)) {
       store.camera.x = panStart.x + (e.clientX - panStart.px);
       store.camera.y = panStart.y + (e.clientY - panStart.py);
       hideTooltip();
       draw();
-      return;
     }
-    const n = nodeAt(e.clientX, e.clientY);
-    const changed = n !== store.hovered;
-    store.hovered = n;
-    if (n) showTooltip(n, e.clientX, e.clientY); else hideTooltip();
-    if (changed) draw();
   });
 
-  function endDrag(e) {
-    if (panning) { panning = false; canvas.classList.remove("dragging"); canvas.releasePointerCapture(e.pointerId); }
+  function endPointer(e) {
+    activePointers.delete(e.pointerId);
+    try { canvas.releasePointerCapture(e.pointerId); } catch { /* already released */ }
+
+    if (pinch && activePointers.size < 2) {
+      pinch = null;
+      suppressClick = true; // lifting the second finger shouldn't register as a tap
+    }
+    if (activePointers.size === 1) {
+      const [p] = [...activePointers.values()];
+      beginPan(p.x, p.y); // resume single-finger panning from the remaining touch without a jump
+    } else if (activePointers.size === 0) {
+      panning = false;
+      canvas.classList.remove("dragging");
+    }
   }
+
   canvas.addEventListener("pointerup", e => {
+    // `pinch` is still set for the first of the two pinch fingers to lift;
+    // `suppressClick` (set by endPointer below) carries that suppression
+    // through to the second finger's lift, which is otherwise a plain
+    // pointerup that looks just like a tap.
+    const suppress = !!pinch || suppressClick;
     const moved = Math.abs(e.clientX - lastPointer.x) > 3 || Math.abs(e.clientY - lastPointer.y) > 3;
-    const clickedNode = !moved ? nodeAt(e.clientX, e.clientY) : null;
-    endDrag(e);
+    const clickedNode = (!moved && !suppress) ? nodeAt(e.clientX, e.clientY) : null;
+    endPointer(e);
+    if (activePointers.size === 0) suppressClick = false;
+    if (suppress) return;
     if (clickedNode) onClick(clickedNode);
     else if (!moved) onClick(null); // clicking empty background clears the current focus
   });
+  canvas.addEventListener("pointercancel", endPointer);
   canvas.addEventListener("pointerleave", () => { hideTooltip(); draw(); });
 
   canvas.addEventListener("wheel", e => {
