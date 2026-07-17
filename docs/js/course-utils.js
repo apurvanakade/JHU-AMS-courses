@@ -16,11 +16,9 @@ export function levelDigit(code) {
 }
 
 // the registrar's own coarse level string (e.g. "Upper Level Undergraduate",
-// "Graduate Independent Academic Work") bucketed into the three groups the
-// old dropdown used.
+// "Graduate") bucketed into the two groups the old dropdown used.
 export function degreeBucket(level) {
   if (!level) return null;
-  if (level.includes("Independent")) return "Independent";
   if (level.includes("Graduate")) return "Graduate";
   return "Undergraduate";
 }

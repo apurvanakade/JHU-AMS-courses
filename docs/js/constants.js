@@ -15,15 +15,14 @@ export const EDGE_STYLE = {
   equivalent:   { dash: [], arrow: false, width: 2.4 },
 };
 
-// Color is keyed by degree (Undergraduate/Graduate/Independent — three
-// hues, fixed) with an ordinal lightness ramp across the course-number
-// column (100s lightest, 800s darkest) inside each hue, rather than a
-// different hue per column: level and degree are two different axes, and
-// eight distinct hues was more identity-work than the graph needed.
+// Color is keyed by degree (Undergraduate/Graduate — two hues, fixed) with
+// an ordinal lightness ramp across the course-number column (100s
+// lightest, 800s darkest) inside each hue, rather than a different hue per
+// column: level and degree are two different axes, and eight distinct hues
+// was more identity-work than the graph needed.
 export const DEGREE_HUE = {
   Undergraduate: { h: 213, s: 68 }, // blue
   Graduate:      { h: 152, s: 45 }, // teal-green
-  Independent:   { h: 262, s: 40 }, // violet
 };
 
 export const COLUMN_WIDTH = 320;

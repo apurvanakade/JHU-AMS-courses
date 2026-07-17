@@ -39,7 +39,7 @@ export function buildFromGraph(g) {
   store.nodes = g.nodes.map(n => ({
     ...n,
     col: levelDigit(n.id),          // course-number column, e.g. "4" for the 400s
-    degreeLevel: degreeBucket(n.level), // "Undergraduate" | "Graduate" | "Independent"
+    degreeLevel: degreeBucket(n.level), // "Undergraduate" | "Graduate"
     firstTerm: firstTermOf(n),      // earliest term on record, or null for stubs
     seasonOnly: seasonOnlyOf(n),    // 'Fall' | 'Spring' | null (offered in both, or a stub)
     x: 0, y: 0, r: 4,
