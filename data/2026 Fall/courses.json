@@ -8800,7 +8800,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867606",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "7/24",
+    "SeatsAvailable": "8/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -9952,7 +9952,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867078",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "6/49",
+    "SeatsAvailable": "5/49",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -10333,7 +10333,7 @@
       "EN Applied Mathematics & Statistics"
     ],
     "Areas": [],
-    "Building": "Hodson",
+    "Building": "Gilman",
     "CMN_TermsID": 1761,
     "CoursePrefix": "EN",
     "Credits": "3.00",
@@ -10405,7 +10405,7 @@
       ],
       "Meetings": [
         {
-          "Building": "Hodson",
+          "Building": "Gilman",
           "DOW": "TTh",
           "Dates": "08-31-2026 to 12-11-2026",
           "Format": "Lecture",
@@ -10937,7 +10937,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867076",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "23/39",
+    "SeatsAvailable": "22/39",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -11417,7 +11417,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867075",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "22/39",
+    "SeatsAvailable": "21/39",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -11527,7 +11527,7 @@
       "EN Applied Mathematics & Statistics"
     ],
     "Areas": [],
-    "Building": "Bloomberg, Maryland",
+    "Building": "Bloomberg, Shaffer",
     "CMN_TermsID": 1761,
     "CoursePrefix": "EN",
     "Credits": "4.00",
@@ -11599,7 +11599,7 @@
       ],
       "Meetings": [
         {
-          "Building": "Maryland",
+          "Building": "Shaffer",
           "DOW": "TTh",
           "Dates": "08-31-2026 to 12-11-2026",
           "Format": "Lecture",
@@ -12826,7 +12826,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867073",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "20/30",
+    "SeatsAvailable": "19/30",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -13864,7 +13864,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866997",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "25/30",
+    "SeatsAvailable": "24/30",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -16338,7 +16338,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866980",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "20/40",
+    "SeatsAvailable": "19/40",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -18580,7 +18580,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867063",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "7/8",
+    "SeatsAvailable": "6/8",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -20455,7 +20455,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867055",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "8/14",
+    "SeatsAvailable": "9/14",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -22548,7 +22548,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866958",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "3/24",
+    "SeatsAvailable": "4/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -23987,7 +23987,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866966",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "1/17",
+    "SeatsAvailable": "0/17",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -24174,7 +24174,7 @@
     "TimeOfDay": "Other",
     "Title": "Mathematical Statistics",
     "UGradPHStudies": "No",
-    "Waitlisted": "6",
+    "Waitlisted": "5",
     "ZoneName": "ASEN - UGrad",
     "ZonesId": 5,
     "id": "866966"
@@ -24446,7 +24446,7 @@
     "TimeOfDay": "Other",
     "Title": "Mathematical Statistics",
     "UGradPHStudies": "No",
-    "Waitlisted": "3",
+    "Waitlisted": "2",
     "ZoneName": "ASEN - UGrad",
     "ZonesId": 5,
     "id": "866965"
@@ -26429,7 +26429,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867683",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "1/15",
+    "SeatsAvailable": "2/15",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -27953,7 +27953,7 @@
     "TimeOfDay": "Other",
     "Title": "Intro to Optimization",
     "UGradPHStudies": "No",
-    "Waitlisted": "0",
+    "Waitlisted": "1",
     "ZoneName": "ASEN - UGrad",
     "ZonesId": 5,
     "id": "866946"
@@ -29018,7 +29018,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866941",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "10/24",
+    "SeatsAvailable": "9/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -29738,7 +29738,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866938",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "0/24",
+    "SeatsAvailable": "2/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -29897,7 +29897,7 @@
     "TimeOfDay": "Other",
     "Title": "Intermediate Probability and Statistics",
     "UGradPHStudies": "No",
-    "Waitlisted": "4",
+    "Waitlisted": "2",
     "ZoneName": "ASEN - UGrad",
     "ZonesId": 5,
     "id": "866938"
@@ -30137,7 +30137,7 @@
     "TimeOfDay": "Morning",
     "Title": "Intermediate Probability and Statistics",
     "UGradPHStudies": "No",
-    "Waitlisted": "2",
+    "Waitlisted": "0",
     "ZoneName": "ASEN - UGrad",
     "ZonesId": 5,
     "id": "866937"
@@ -32283,7 +32283,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867012",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "3/24",
+    "SeatsAvailable": "2/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -32545,7 +32545,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867011",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "12/24",
+    "SeatsAvailable": "11/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -33073,7 +33073,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867009",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "2/24",
+    "SeatsAvailable": "1/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -33601,7 +33601,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867007",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "0/24",
+    "SeatsAvailable": "1/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -33789,7 +33789,7 @@
     "TimeOfDay": "Morning",
     "Title": "Probability and Statistics for the Life Sciences",
     "UGradPHStudies": "No",
-    "Waitlisted": "4",
+    "Waitlisted": "3",
     "ZoneName": "ASEN - UGrad",
     "ZonesId": 5,
     "id": "867007"
@@ -34540,7 +34540,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866924",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "4/24",
+    "SeatsAvailable": "5/24",
     "SectionDetails": {
       "CoRequisites": [
         {
@@ -35013,7 +35013,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866922",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "15/18",
+    "SeatsAvailable": "16/18",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -36405,7 +36405,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "865879",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "15/19",
+    "SeatsAvailable": "14/19",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -38268,7 +38268,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "865870",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "15/19",
+    "SeatsAvailable": "16/19",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",

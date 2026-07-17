@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-16T02:36:12.148358+00:00",
+  "generated_at": "2026-07-17T14:44:53.515005+00:00",
   "nodes": [
     {
       "id": "EN.553.792",
@@ -248,7 +248,7 @@
           "instructors": [],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=123390",
           "max_seats": "49",
-          "seats_available": "6/49",
+          "seats_available": "5/49",
           "waitlisted": "0",
           "status": "Open"
         }
@@ -507,7 +507,7 @@
           ],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=123383",
           "max_seats": "39",
-          "seats_available": "23/39",
+          "seats_available": "22/39",
           "waitlisted": "0",
           "status": "Open"
         }
@@ -627,7 +627,7 @@
           "instructors": [],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=198523",
           "max_seats": "39",
-          "seats_available": "22/39",
+          "seats_available": "21/39",
           "waitlisted": "0",
           "status": "Open"
         }
@@ -1414,7 +1414,7 @@
           ],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=159659",
           "max_seats": "30",
-          "seats_available": "20/30",
+          "seats_available": "19/30",
           "waitlisted": "0",
           "status": "Reserved Open"
         }
@@ -1852,7 +1852,7 @@
           ],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=123361",
           "max_seats": "30",
-          "seats_available": "25/30",
+          "seats_available": "24/30",
           "waitlisted": "0",
           "status": "Reserved Open"
         },
@@ -2955,7 +2955,7 @@
           ],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=123342",
           "max_seats": "40",
-          "seats_available": "20/40",
+          "seats_available": "19/40",
           "waitlisted": "0",
           "status": "Reserved Open"
         },
@@ -4652,7 +4652,7 @@
           ],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=123301",
           "max_seats": "14",
-          "seats_available": "8/14",
+          "seats_available": "9/14",
           "waitlisted": "0",
           "status": "Open"
         }
@@ -5828,7 +5828,7 @@
           ],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=123292",
           "max_seats": "24",
-          "seats_available": "3/24",
+          "seats_available": "4/24",
           "waitlisted": "0",
           "status": "Open"
         },
@@ -6935,8 +6935,8 @@
           ],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=123285",
           "max_seats": "17",
-          "seats_available": "1/17",
-          "waitlisted": "6",
+          "seats_available": "0/17",
+          "waitlisted": "5",
           "status": "Waitlist Only"
         },
         {
@@ -6948,7 +6948,7 @@
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=123284",
           "max_seats": "24",
           "seats_available": "0/24",
-          "waitlisted": "3",
+          "waitlisted": "2",
           "status": "Waitlist Only"
         },
         {
@@ -8583,7 +8583,7 @@
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=123266",
           "max_seats": "24",
           "seats_available": "0/24",
-          "waitlisted": "0",
+          "waitlisted": "1",
           "status": "Waitlist Only"
         },
         {
@@ -9338,7 +9338,7 @@
           ],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=123264",
           "max_seats": "24",
-          "seats_available": "10/24",
+          "seats_available": "9/24",
           "waitlisted": "0",
           "status": "Open"
         },
@@ -9374,8 +9374,8 @@
           ],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=123261",
           "max_seats": "24",
-          "seats_available": "0/24",
-          "waitlisted": "4",
+          "seats_available": "2/24",
+          "waitlisted": "2",
           "status": "Waitlist Only"
         },
         {
@@ -9387,7 +9387,7 @@
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=123260",
           "max_seats": "24",
           "seats_available": "1/24",
-          "waitlisted": "2",
+          "waitlisted": "0",
           "status": "Waitlist Only"
         },
         {
@@ -10890,7 +10890,7 @@
           "instructors": [],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourse.publicSyllabus?courseid=26430",
           "max_seats": "24",
-          "seats_available": "3/24",
+          "seats_available": "2/24",
           "waitlisted": "0",
           "status": "Open"
         },
@@ -10900,7 +10900,7 @@
           "instructors": [],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourse.publicSyllabus?courseid=26430",
           "max_seats": "24",
-          "seats_available": "12/24",
+          "seats_available": "11/24",
           "waitlisted": "0",
           "status": "Open"
         },
@@ -10924,7 +10924,7 @@
           ],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=123244",
           "max_seats": "24",
-          "seats_available": "2/24",
+          "seats_available": "1/24",
           "waitlisted": "0",
           "status": "Open"
         },
@@ -10948,8 +10948,8 @@
           ],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=123242",
           "max_seats": "24",
-          "seats_available": "0/24",
-          "waitlisted": "4",
+          "seats_available": "1/24",
+          "waitlisted": "3",
           "status": "Waitlist Only"
         },
         {
@@ -11575,7 +11575,7 @@
           ],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=198377",
           "max_seats": "24",
-          "seats_available": "4/24",
+          "seats_available": "5/24",
           "waitlisted": "0",
           "status": "Open"
         },
@@ -11891,7 +11891,7 @@
           "instructors": [],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=198375",
           "max_seats": "18",
-          "seats_available": "15/18",
+          "seats_available": "16/18",
           "waitlisted": "0",
           "status": "Open"
         }
@@ -17277,7 +17277,7 @@
           ],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourse.publicSyllabus?courseid=7051",
           "max_seats": "15",
-          "seats_available": "1/15",
+          "seats_available": "2/15",
           "waitlisted": "0",
           "status": "Open"
         },
@@ -18239,7 +18239,7 @@
           ],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourse.publicSyllabus?courseid=28609",
           "max_seats": "24",
-          "seats_available": "7/24",
+          "seats_available": "8/24",
           "waitlisted": "0",
           "status": "Open"
         }
@@ -18481,7 +18481,7 @@
           ],
           "syllabus_url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=198475",
           "max_seats": "8",
-          "seats_available": "7/8",
+          "seats_available": "6/8",
           "waitlisted": "0",
           "status": "Open"
         }
