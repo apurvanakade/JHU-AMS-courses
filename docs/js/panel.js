@@ -101,6 +101,36 @@ export function selectNode(n) {
   if (isNew) meta.appendChild(el("span", { text: "New this term" }));
   panelBody.appendChild(meta);
 
+  const currentSections = (n.sections || []).filter(s => s.term === store.term);
+  if (currentSections.length) {
+    panelBody.appendChild(el("h3", { text: `Sections — ${store.term}` }));
+    const table = el("table", { class: "sections" });
+    const thead = el("tr");
+    for (const h of ["Sec", "Instructor(s)", "Seats", "Status", ""]) {
+      thead.appendChild(el("th", { text: h }));
+    }
+    table.appendChild(thead);
+    const sorted = [...currentSections].sort((a, b) => (a.section || "").localeCompare(b.section || ""));
+    for (const s of sorted) {
+      const row = el("tr");
+      row.appendChild(el("td", { class: "section-term", text: s.section || "" }));
+      row.appendChild(el("td", { class: "section-instructors", text: (s.instructors || []).join(", ") }));
+      row.appendChild(el("td", { text: s.seats_available || "" }));
+      row.appendChild(el("td", { text: s.status || "" }));
+      const linkCell = el("td");
+      if (s.syllabus_url) {
+        linkCell.appendChild(el("a", {
+          class: "course-link", text: "Syllabus",
+          href: s.syllabus_url, target: "_blank", rel: "noopener noreferrer",
+        }));
+      }
+      row.appendChild(linkCell);
+      table.appendChild(row);
+    }
+    const scroll = el("div", { class: "table-scroll" }, [table]);
+    panelBody.appendChild(scroll);
+  }
+
   if (n.description) {
     panelBody.appendChild(el("h3", { text: "Description" }));
     panelBody.appendChild(el("div", { class: "desc", text: n.description }));
@@ -141,36 +171,6 @@ export function selectNode(n) {
     const list = document.createElement("div");
     Array.from(new Set(equivalents)).forEach(code => { list.appendChild(courseLink(code)); list.appendChild(document.createElement("br")); });
     panelBody.appendChild(list);
-  }
-
-  const currentSections = (n.sections || []).filter(s => s.term === store.term);
-  if (currentSections.length) {
-    panelBody.appendChild(el("h3", { text: `Sections — ${store.term}` }));
-    const table = el("table", { class: "sections" });
-    const thead = el("tr");
-    for (const h of ["Sec", "Instructor(s)", "Seats", "Status", ""]) {
-      thead.appendChild(el("th", { text: h }));
-    }
-    table.appendChild(thead);
-    const sorted = [...currentSections].sort((a, b) => (a.section || "").localeCompare(b.section || ""));
-    for (const s of sorted) {
-      const row = el("tr");
-      row.appendChild(el("td", { class: "section-term", text: s.section || "" }));
-      row.appendChild(el("td", { class: "section-instructors", text: (s.instructors || []).join(", ") }));
-      row.appendChild(el("td", { text: s.seats_available || "" }));
-      row.appendChild(el("td", { text: s.status || "" }));
-      const linkCell = el("td");
-      if (s.syllabus_url) {
-        linkCell.appendChild(el("a", {
-          class: "course-link", text: "Syllabus",
-          href: s.syllabus_url, target: "_blank", rel: "noopener noreferrer",
-        }));
-      }
-      row.appendChild(linkCell);
-      table.appendChild(row);
-    }
-    const scroll = el("div", { class: "table-scroll" }, [table]);
-    panelBody.appendChild(scroll);
   }
 
   const otherTerms = (n.terms || []).filter(t => t !== store.term);
