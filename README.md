@@ -73,11 +73,16 @@ records into one row per course, extracting:
 - **Exclusions** — mutual-exclusion rules (JHU's `CoRequisites` field is,
   confusingly, always actually a "may not be taken concurrently with" rule
   in this data, never a true corequisite)
-- **Equivalencies** — cross-numbering, e.g. `EN.550.310` ≡ `EN.553.311`
+- **Equivalencies** — cross-numbering, e.g. `EN.553.310` ≡ `EN.553.311`
 
 500-level, 800-level, and "Independent Academic Work" sections (JHU's label
 for independent-study arrangements) are excluded — one-off student/faculty
 arrangements, not real courses worth showing in the graph.
+
+`EN.550.*` — the department's old numbering, from before it was renumbered
+to `EN.553.*` — and any referenced course with no title at all (no JHU
+catalog title and never scraped directly) are dropped from the database
+entirely, not just hidden as stubs.
 
 Writes two outputs, both fully reproducible by re-running the script:
 

@@ -96,8 +96,14 @@ into one row per course, extracting the relationships between courses:
   (confusingly) JHU's `CoRequisites` field, which in this data is always
   actually a mutual-exclusion rule ("may not be taken concurrently with"),
   never a true corequisite.
-- **Equivalencies** — cross-numbering, e.g. `EN.550.310` ≡ `EN.553.311`
-  (the department was renumbered from 550 to 553 at some point).
+- **Equivalencies** — cross-numbering, e.g. `EN.553.310` ≡ `EN.553.311`.
+
+`EN.550.*` is the department's old numbering, from before it was renumbered
+to `EN.553.*`; it never appears as a scraped course, only as a stale
+reference inside another course's prerequisite/corequisite/equivalency data
+(JHU's own records still carry the old codes in a handful of spots). Every
+such reference is dropped completely — not even a stub node — via
+`is_deprecated_code()`/`strip_codes()` in `build_courses()`.
 
 Only `EN.553.*` codes count as real AMS courses. Any other code referenced
 as a prerequisite/corequisite/equivalency of an AMS course (e.g.
@@ -105,7 +111,9 @@ as a prerequisite/corequisite/equivalency of an AMS course (e.g.
 in via `AllDepartments` matching) gets a stub node instead of a full one,
 titled from JHU's own `PrereqCoursesCatalogs` metadata or its own scraped
 title when available — even if it was scraped as its own record, so it's
-never treated as a first-class AMS course.
+never treated as a first-class AMS course. If neither source gives it a
+title, it's dropped the same way `EN.550.*` is — a stub with no title and
+no data of its own isn't worth a node.
 
 500-level, 800-level, and "Independent Academic Work"-level sections (JHU's
 label for independent-study arrangements) are dropped before they're
