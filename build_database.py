@@ -7,10 +7,18 @@ collapses per-term/per-section records down to one row per course, and
 extracts the relationships between courses: prerequisite logic (AND/OR
 trees), mutual-exclusion rules, and cross-numbering equivalencies.
 
+JHU's `CoRequisites` field is intentionally not extracted at all — despite
+the name, it's always actually a same-term mutual-exclusion rule ("may not
+be taken concurrently with"), never a true corequisite. Since the
+visualizer's graph isn't scoped to a single term, there's no way to render
+"can't combine in the same term" as distinct from any other relationship,
+so this field is dropped on load rather than kept as a edge type nobody
+can usefully read.
+
 EN.550.* is the department's old numbering (renumbered to EN.553.* at some
 point) and is deprecated — it never appears as a scraped course, only as
-stale references inside other courses' prerequisite/corequisite/equivalency
-data (JHU's own records still carry the old codes in a handful of spots).
+stale references inside other courses' prerequisite/equivalency data
+(JHU's own records still carry the old codes in a handful of spots).
 Those references are dropped entirely rather than turned into stub nodes,
 along with any other referenced code that has no usable title at all (no
 `PrereqCoursesCatalogs` entry and never scraped directly) — a stub node
@@ -21,37 +29,36 @@ Two outputs are written:
 
 - `db/courses.db` (SQLite): the queryable source of truth. Tables:
   `courses`, `course_terms`, `course_sections`, `prereq_nodes`,
-  `corequisite_nodes`, `equivalencies`. `course_sections` holds one row per
-  actual section per term (instructors, syllabus URL) since a single course
-  can have many sections in one term taught by different people — this data
-  doesn't collapse to one row per course the way `courses` does.
-  Prerequisite/corequisite logic is stored as a tree
-  (self-referencing `parent_id`) rather than flattened, so "(A or B) and C"
-  is preserved exactly rather than collapsed into loose edges. Gitignored —
-  fully reproducible from `data/` by re-running this script.
+  `equivalencies`. `course_sections` holds one row per actual section per
+  term (instructors, syllabus URL) since a single course can have many
+  sections in one term taught by different people — this data doesn't
+  collapse to one row per course the way `courses` does. Prerequisite logic
+  is stored as a tree (self-referencing `parent_id`) rather than flattened,
+  so "(A or B) and C" is preserved exactly rather than collapsed into loose
+  edges. Gitignored — fully reproducible from `data/` by re-running this
+  script.
 - `docs/graph.json`: a nodes/edges export flattened from the database, for
   the static visualizer at `docs/index.html`. `docs/` doubles as the GitHub
   Pages source, so this file is committed (unlike `db/`) — the published
   site has no build step and fetches it directly. Each node keeps its full
-  prerequisite/corequisite tree (`prerequisites`/`corequisites`) in
-  addition to the flattened `edges` list, so a consumer can render a simple
-  graph or the exact logic.
+  prerequisite tree (`prerequisites`) in addition to the flattened `edges`
+  list, so a consumer can render a simple graph or the exact logic.
 
 Only `EN.553.*` codes are real AMS courses. Any other code referenced as a
-prerequisite/corequisite/equivalency of an AMS course (e.g. AS.110.202
-Calculus III, or a cross-listed EN.500/EN.601 course pulled in by
-`AllDepartments` matching) gets a "stub" node instead of a full one, titled
-from `PrereqCoursesCatalogs` or its own scraped title when available — even
-if it was scraped as its own record, so prerequisite edges always resolve
-to a node without treating non-AMS courses as first-class. If neither
-source has a title for it, the reference is dropped instead (see above).
+prerequisite/equivalency of an AMS course (e.g. AS.110.202 Calculus III, or
+a cross-listed EN.500/EN.601 course pulled in by `AllDepartments` matching)
+gets a "stub" node instead of a full one, titled from `PrereqCoursesCatalogs`
+or its own scraped title when available — even if it was scraped as its own
+record, so prerequisite edges always resolve to a node without treating
+non-AMS courses as first-class. If neither source has a title for it, the
+reference is dropped instead (see above).
 
 500-level, 800-level, and "Independent Academic Work" sections (JHU's own
 label for independent-study arrangements) are dropped entirely before
 being collapsed into `courses` — see `is_excluded()`. These are one-off
 student/faculty arrangements, not real courses, and nothing else in the
-scraped data references them as a prerequisite/corequisite/equivalency, so
-excluding them doesn't leave any dangling stub nodes behind.
+scraped data references them as a prerequisite/equivalency, so excluding
+them doesn't leave any dangling stub nodes behind.
 
 Usage:
     python3 build_database.py              # reads data/, writes db/ + docs/graph.json
@@ -74,7 +81,7 @@ DOCS_DIR = "docs"
 
 
 # ---------------------------------------------------------------------------
-# Prerequisite/corequisite expression parsing
+# Prerequisite expression parsing
 #
 # Expressions look like:
 #   "EN.550.692[C]"
@@ -156,14 +163,14 @@ def referenced_courses(node: dict) -> set[str]:
 def is_deprecated_code(code: str) -> bool:
     """EN.550.* is the department's pre-renumbering code (now EN.553.*).
     It never appears as a scraped course, only as a stale reference inside
-    other courses' prerequisite/corequisite/equivalency data, and is
-    dropped everywhere rather than kept as a stub node."""
+    other courses' prerequisite/equivalency data, and is dropped everywhere
+    rather than kept as a stub node."""
     return code.startswith("EN.550.")
 
 
 def strip_codes(node: dict | None, drop_codes: set[str]) -> dict | None:
-    """Prune COURSE leaves in `drop_codes` out of a parsed prereq/coreq
-    tree, collapsing ALL/ANY groups down as children are removed. Returns
+    """Prune COURSE leaves in `drop_codes` out of a parsed prereq tree,
+    collapsing ALL/ANY groups down as children are removed. Returns
     None if nothing is left (e.g. the whole expression referenced a dropped
     code)."""
     if node is None:
@@ -221,7 +228,6 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> tuple[dict[str, d
         "sections": [],     # list of (term, section, instructors, syllabus_url,
                             #           max_seats, seats_available, waitlisted, status)
         "prereq_raw": [],   # list of (expression, description, is_negative)
-        "coreq_raw": [],    # list of (expression, description)
         "equivalent_to": set(),
         "pcc_titles": {},   # course code -> title, from PrereqCoursesCatalogs
     })
@@ -266,8 +272,6 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> tuple[dict[str, d
                     p.get("Description", ""),
                     p.get("IsNegative") == "Y",
                 ))
-            for c in sd.get("CoRequisites") or []:
-                row["coreq_raw"].append((c.get("Expression", ""), c.get("Description", "")))
             for eq in sd.get("Equivalencies") or []:
                 name = eq.get("CourseName")
                 if name:
@@ -283,7 +287,7 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> tuple[dict[str, d
     # whether it happened to be scraped as its own record.
     real_codes = {code for code in by_code if code.startswith("EN.553.")}
 
-    # External-title map: courses referenced as a prereq/coreq of an AMS
+    # External-title map: courses referenced as a prereq of an AMS
     # course but never real AMS courses themselves (out of department
     # scope). Prefer JHU's own PrereqCoursesCatalogs title; fall back to a
     # scraped title if the external course happened to be scraped directly
@@ -303,19 +307,16 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> tuple[dict[str, d
             return most_common(by_code[code]["titles"])
         return external_titles.get(code)
 
-    # Only AMS courses' own prerequisite/corequisite/equivalency data
-    # defines which external courses are worth a stub node — an external
-    # course's own prereqs (e.g. EN.500.113's mutual-exclusion with other
-    # EN.500 sections) aren't part of the AMS graph. This first pass is
-    # unfiltered (drop_codes isn't known yet) — it just finds the full
-    # universe of referenced codes.
+    # Only AMS courses' own prerequisite/equivalency data defines which
+    # external courses are worth a stub node — an external course's own
+    # prereqs (e.g. EN.500.113's mutual-exclusion with other EN.500
+    # sections) aren't part of the AMS graph. This first pass is unfiltered
+    # (drop_codes isn't known yet) — it just finds the full universe of
+    # referenced codes.
     referenced = set()
     for code in real_codes:
         row = by_code[code]
         for expr, _desc, _neg in row["prereq_raw"]:
-            if expr:
-                referenced |= referenced_courses(parse_expression(expr))
-        for expr, _desc in row["coreq_raw"]:
             if expr:
                 referenced |= referenced_courses(parse_expression(expr))
         referenced |= row["equivalent_to"]
@@ -346,7 +347,6 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> tuple[dict[str, d
             "terms": sorted(row["terms"], key=_term_sort_key),
             "sections": dedupe_preserve_order(row["sections"]),
             "prereq_raw": dedupe_preserve_order(row["prereq_raw"]),
-            "coreq_raw": dedupe_preserve_order(row["coreq_raw"]),
             "equivalent_to": sorted(c for c in row["equivalent_to"] if c not in drop_codes),
             "stub": False,
         }
@@ -356,7 +356,7 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> tuple[dict[str, d
             "code": code, "title": external_titles.get(code), "description": None,
             "department": None, "school": None, "level": None, "credits": None,
             "all_departments": [], "areas": [], "pos_tags": [], "cross_listed": False,
-            "terms": [], "sections": [], "prereq_raw": [], "coreq_raw": [], "equivalent_to": [],
+            "terms": [], "sections": [], "prereq_raw": [], "equivalent_to": [],
             "stub": True,
         }
 
@@ -400,7 +400,7 @@ CREATE TABLE courses (
     areas TEXT,             -- JSON array
     pos_tags TEXT,          -- JSON array
     cross_listed INTEGER,
-    is_stub INTEGER         -- 1 if only ever seen as a prereq/coreq reference
+    is_stub INTEGER         -- 1 if only ever seen as a prereq reference
 );
 
 CREATE TABLE course_terms (
@@ -433,16 +433,6 @@ CREATE TABLE prereq_nodes (
     raw_description TEXT           -- set on root nodes only
 );
 
-CREATE TABLE corequisite_nodes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    course_code TEXT REFERENCES courses(code),
-    parent_id INTEGER REFERENCES corequisite_nodes(id),
-    node_type TEXT NOT NULL,
-    ref_course_code TEXT,
-    raw_expression TEXT,
-    raw_description TEXT
-);
-
 CREATE TABLE equivalencies (
     course_a TEXT REFERENCES courses(code),
     course_b TEXT REFERENCES courses(code),
@@ -456,8 +446,6 @@ CREATE TABLE metadata (
 
 CREATE INDEX idx_prereq_course ON prereq_nodes(course_code);
 CREATE INDEX idx_prereq_ref ON prereq_nodes(ref_course_code);
-CREATE INDEX idx_coreq_course ON corequisite_nodes(course_code);
-CREATE INDEX idx_coreq_ref ON corequisite_nodes(ref_course_code);
 """
 
 
@@ -497,14 +485,6 @@ def build_database(courses: dict[str, dict], drop_codes: set[str], db_path: str,
             if tree is None:
                 continue
             insert_prereq_root(cur, code, tree, is_negative, expression, description)
-
-        for expression, description in c["coreq_raw"]:
-            if not expression:
-                continue
-            tree = strip_codes(parse_expression(expression), drop_codes)
-            if tree is None:
-                continue
-            insert_coreq_root(cur, code, tree, expression, description)
 
         for other in c["equivalent_to"]:
             a, b = sorted((code, other))
@@ -553,42 +533,6 @@ def insert_prereq_child(cur, course_code, node, parent_id):
         insert_prereq_child(cur, course_code, child, node_id)
 
 
-def insert_coreq_root(cur, course_code, tree, expression, description):
-    if tree["type"] == "COURSE":
-        cur.execute(
-            "INSERT INTO corequisite_nodes (course_code, parent_id, node_type, ref_course_code, "
-            "raw_expression, raw_description) VALUES (?, NULL, 'COURSE', ?, ?, ?)",
-            (course_code, tree["course"], expression, description),
-        )
-        return
-    cur.execute(
-        "INSERT INTO corequisite_nodes (course_code, parent_id, node_type, ref_course_code, "
-        "raw_expression, raw_description) VALUES (?, NULL, ?, NULL, ?, ?)",
-        (course_code, tree["type"], expression, description),
-    )
-    root_id = cur.lastrowid
-    for child in tree["children"]:
-        insert_coreq_child(cur, course_code, child, root_id)
-
-
-def insert_coreq_child(cur, course_code, node, parent_id):
-    if node["type"] == "COURSE":
-        cur.execute(
-            "INSERT INTO corequisite_nodes (course_code, parent_id, node_type, ref_course_code, "
-            "raw_expression, raw_description) VALUES (?, ?, 'COURSE', ?, NULL, NULL)",
-            (course_code, parent_id, node["course"]),
-        )
-        return
-    cur.execute(
-        "INSERT INTO corequisite_nodes (course_code, parent_id, node_type, ref_course_code, "
-        "raw_expression, raw_description) VALUES (?, ?, ?, NULL, NULL, NULL)",
-        (course_code, parent_id, node["type"]),
-    )
-    node_id = cur.lastrowid
-    for child in node["children"]:
-        insert_coreq_child(cur, course_code, child, node_id)
-
-
 # ---------------------------------------------------------------------------
 # graph.json export
 # ---------------------------------------------------------------------------
@@ -602,7 +546,7 @@ def tree_to_json(node: dict) -> dict:
 
 def flatten_edges(course_code: str, node: dict, edge_type: str, group_id: int,
                    is_exclusion: bool, edges: list) -> None:
-    """Flatten a prereq/coreq tree into simple source->target edges for graphs
+    """Flatten a prereq tree into simple source->target edges for graphs
     that don't need exact AND/OR logic. `group_id` ties edges from the same
     tree back together so a consumer can still distinguish "any of these"
     from "all of these" if it wants to."""
@@ -649,17 +593,6 @@ def build_graph(courses: dict[str, dict], drop_codes: set[str], generated_at: st
             })
             flatten_edges(code, tree, "prerequisite", group_id, is_negative, edges)
 
-        coreq_trees = []
-        for expression, description in c["coreq_raw"]:
-            if not expression:
-                continue
-            tree = strip_codes(parse_expression(expression), drop_codes)
-            if tree is None:
-                continue
-            group_id += 1
-            coreq_trees.append({"logic": tree_to_json(tree), "description": description})
-            flatten_edges(code, tree, "corequisite", group_id, False, edges)
-
         nodes.append({
             "id": code,
             "title": c["title"],
@@ -675,7 +608,6 @@ def build_graph(courses: dict[str, dict], drop_codes: set[str], generated_at: st
             "terms": c["terms"],
             "stub": c["stub"],
             "prerequisites": prereq_trees,
-            "corequisites": coreq_trees,
             "sections": [
                 {"term": term, "section": section, "instructors": list(instructors),
                  "syllabus_url": syllabus_url or None, "max_seats": max_seats or None,

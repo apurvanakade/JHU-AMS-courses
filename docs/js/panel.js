@@ -142,12 +142,6 @@ export function selectNode(n) {
     panelBody.appendChild(preBlock);
   }
 
-  const coBlock = reqBlock((n.corequisites || []).map(c => ({ ...c, is_exclusion: false })), "Cannot combine with: ");
-  if (coBlock) {
-    panelBody.appendChild(el("h3", { text: "Corequisite notes" }));
-    panelBody.appendChild(coBlock);
-  }
-
   const unlocks = store.edges.filter(e => e.type === "prerequisite" && e.source.id === n.id).map(e => e.target.id);
   const excludedBy = store.edges.filter(e => e.type === "exclusion" && (e.source.id === n.id || e.target.id === n.id))
     .map(e => (e.source.id === n.id ? e.target.id : e.source.id));

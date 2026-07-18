@@ -92,48 +92,53 @@ into one row per course, extracting the relationships between courses:
   the parser follows conventional precedence (`AND` binds tighter than
   `OR`) since even JHU's own human-readable description of that expression
   leaves the ambiguity unresolved.
-- **Exclusions** — `IsNegative: "Y"` on a prerequisite entry, and
-  (confusingly) JHU's `CoRequisites` field, which in this data is always
-  actually a mutual-exclusion rule ("may not be taken concurrently with"),
-  never a true corequisite.
+- **Exclusions** — `IsNegative: "Y"` on a prerequisite entry.
 - **Equivalencies** — cross-numbering, e.g. `EN.553.310` ≡ `EN.553.311`.
+
+JHU's `CoRequisites` field is read from the scraped data but never
+extracted into the database or graph — despite the name, it's always
+actually a same-term mutual-exclusion rule ("may not be taken concurrently
+with"), never a true corequisite. The visualizer's graph isn't scoped to a
+single term, so there's no way to distinguish "can't combine in the same
+term" from any other relationship on it; rather than mislabel it as a
+generic exclusion, the field is dropped entirely.
 
 `EN.550.*` is the department's old numbering, from before it was renumbered
 to `EN.553.*`; it never appears as a scraped course, only as a stale
-reference inside another course's prerequisite/corequisite/equivalency data
-(JHU's own records still carry the old codes in a handful of spots). Every
-such reference is dropped completely — not even a stub node — via
+reference inside another course's prerequisite/equivalency data (JHU's own
+records still carry the old codes in a handful of spots). Every such
+reference is dropped completely — not even a stub node — via
 `is_deprecated_code()`/`strip_codes()` in `build_courses()`.
 
 Only `EN.553.*` codes count as real AMS courses. Any other code referenced
-as a prerequisite/corequisite/equivalency of an AMS course (e.g.
-`AS.110.202` Calculus III, or a cross-listed `EN.500`/`EN.601` course pulled
-in via `AllDepartments` matching) gets a stub node instead of a full one,
-titled from JHU's own `PrereqCoursesCatalogs` metadata or its own scraped
-title when available — even if it was scraped as its own record, so it's
-never treated as a first-class AMS course. If neither source gives it a
-title, it's dropped the same way `EN.550.*` is — a stub with no title and
-no data of its own isn't worth a node.
+as a prerequisite/equivalency of an AMS course (e.g. `AS.110.202` Calculus
+III, or a cross-listed `EN.500`/`EN.601` course pulled in via
+`AllDepartments` matching) gets a stub node instead of a full one, titled
+from JHU's own `PrereqCoursesCatalogs` metadata or its own scraped title
+when available — even if it was scraped as its own record, so it's never
+treated as a first-class AMS course. If neither source gives it a title,
+it's dropped the same way `EN.550.*` is — a stub with no title and no data
+of its own isn't worth a node.
 
 500-level, 800-level, and "Independent Academic Work"-level sections (JHU's
 label for independent-study arrangements) are dropped before they're
 collapsed into a course row (`is_excluded()`) — these are one-off
 student/faculty arrangements, not real courses, and add nodes to the graph
 with little to no navigational value. Nothing else in the scraped data
-references them as a prerequisite/corequisite/equivalency, so dropping them
-doesn't leave dangling stub nodes behind.
+references them as a prerequisite/equivalency, so dropping them doesn't
+leave dangling stub nodes behind.
 
 Two outputs, both fully reproducible by re-running the script:
 - `db/courses.db` (SQLite, gitignored) — the queryable source of truth,
-  with prerequisite/corequisite logic stored as a tree via `parent_id`
-  rather than flattened, so `(A or B) and C` round-trips exactly. Most
-  tables (`courses`, `prereq_nodes`, `corequisite_nodes`, `equivalencies`)
-  hold one row per course, since that's the collapsed unit the rest of the
-  script works with. `course_sections` is the exception: it keeps one row
-  per actual section per term (`instructors`, `syllabus_url`, `max_seats`,
-  `seats_available`, `waitlisted`, `status`) because a single course can
-  have many sections in the same term taught by different people — that
-  data doesn't collapse to one row per course the way everything else does.
+  with prerequisite logic stored as a tree via `parent_id` rather than
+  flattened, so `(A or B) and C` round-trips exactly. Most tables
+  (`courses`, `prereq_nodes`, `equivalencies`) hold one row per course,
+  since that's the collapsed unit the rest of the script works with.
+  `course_sections` is the exception: it keeps one row per actual section
+  per term (`instructors`, `syllabus_url`, `max_seats`, `seats_available`,
+  `waitlisted`, `status`) because a single course can have many sections in
+  the same term taught by different people — that data doesn't collapse to
+  one row per course the way everything else does.
 - `docs/graph.json` (committed) — a nodes/edges flattening of the same data
   for `docs/index.html` to fetch directly; no server-side build step. Each
   node's `sections` array mirrors `course_sections` (term, section,
@@ -182,11 +187,10 @@ course level (the course number's hundreds digit, so `EN.553.310` sits in
 the "300s" column), ordered top-to-bottom within each column by a one-time
 barycenter sweep against connected courses to reduce crossings. Node fill
 color encodes level (categorical, one hue per column); edge dash pattern
-encodes relationship type (solid+arrow = prerequisite, dotted =
-corequisite/can't-combine, dashed = mutually exclusive, thick solid =
-equivalent). There is no physics simulation — positions are computed once
-at load and never move on their own; the only interactivity is
-pan/zoom/click.
+encodes relationship type (solid+arrow = prerequisite, dashed = mutually
+exclusive, thick solid = equivalent). There is no physics simulation —
+positions are computed once at load and never move on their own; the only
+interactivity is pan/zoom/click.
 
 This folder doubles as the GitHub Pages source (repo Settings → Pages →
 Deploy from branch → `/docs`), so `graph.json` must stay committed even
