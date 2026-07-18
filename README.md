@@ -9,8 +9,7 @@ Three pieces:
 
 - `fetch_courses.py` — scrapes one term into `data/<Year> <Season>/`
 - `build_database.py` — reads all scraped terms and extracts prerequisite/
-  corequisite/equivalency relationships into `db/courses.db` and
-  `docs/graph.json`
+  exclusion relationships into `db/courses.db` and `docs/graph.json`
 - `docs/index.html` — a static, dependency-free visualizer that fetches
   `graph.json` and renders it as a graph, published via GitHub Pages from
   `docs/`
@@ -73,7 +72,6 @@ records into one row per course, extracting:
 - **Exclusions** — mutual-exclusion rules (JHU's `CoRequisites` field is,
   confusingly, always actually a "may not be taken concurrently with" rule
   in this data, never a true corequisite)
-- **Equivalencies** — cross-numbering, e.g. `EN.553.310` ≡ `EN.553.311`
 
 500-level, 800-level, and "Independent Academic Work" sections (JHU's label
 for independent-study arrangements) are excluded — one-off student/faculty
@@ -103,9 +101,8 @@ open, since it fetches `graph.json`).
 `docs/index.html` is a single self-contained file — no dependencies, no
 build step. It lays out one column per course level (e.g. `EN.553.310`
 sits in the "300s" column) and encodes relationship type in edge style
-(solid+arrow = prerequisite, dotted = corequisite/can't-combine, dashed =
-mutually exclusive, thick solid = equivalent). Pan, zoom, and click a node
-for details.
+(solid+arrow = prerequisite, dashed = mutually exclusive). Pan, zoom, and
+click a node for details.
 
 This is also the published site, via GitHub Pages (`Settings → Pages →
 Deploy from branch → /docs`).

@@ -5,7 +5,7 @@ Build a course-connections database from the scraped term data in `data/`.
 Reads every `data/<Year> <Season>/courses.json` produced by fetch_courses.py,
 collapses per-term/per-section records down to one row per course, and
 extracts the relationships between courses: prerequisite logic (AND/OR
-trees), mutual-exclusion rules, and cross-numbering equivalencies.
+trees) and mutual-exclusion rules.
 
 JHU's `CoRequisites` field is intentionally not extracted at all — despite
 the name, it's always actually a same-term mutual-exclusion rule ("may not
@@ -17,8 +17,8 @@ can usefully read.
 
 EN.550.* is the department's old numbering (renumbered to EN.553.* at some
 point) and is deprecated — it never appears as a scraped course, only as
-stale references inside other courses' prerequisite/equivalency data
-(JHU's own records still carry the old codes in a handful of spots).
+stale references inside other courses' prerequisite data (JHU's own
+records still carry the old codes in a handful of spots).
 Those references are dropped entirely rather than turned into stub nodes,
 along with any other referenced code that has no usable title at all (no
 `PrereqCoursesCatalogs` entry and never scraped directly) — a stub node
@@ -28,8 +28,8 @@ with neither a title nor its own data isn't worth showing. See
 Two outputs are written:
 
 - `db/courses.db` (SQLite): the queryable source of truth. Tables:
-  `courses`, `course_terms`, `course_sections`, `prereq_nodes`,
-  `equivalencies`. `course_sections` holds one row per actual section per
+  `courses`, `course_terms`, `course_sections`, `prereq_nodes`.
+  `course_sections` holds one row per actual section per
   term (instructors, syllabus URL) since a single course can have many
   sections in one term taught by different people — this data doesn't
   collapse to one row per course the way `courses` does. Prerequisite logic
@@ -45,7 +45,7 @@ Two outputs are written:
   list, so a consumer can render a simple graph or the exact logic.
 
 Only `EN.553.*` codes are real AMS courses. Any other code referenced as a
-prerequisite/equivalency of an AMS course (e.g. AS.110.202 Calculus III, or
+prerequisite of an AMS course (e.g. AS.110.202 Calculus III, or
 a cross-listed EN.500/EN.601 course pulled in by `AllDepartments` matching)
 gets a "stub" node instead of a full one, titled from `PrereqCoursesCatalogs`
 or its own scraped title when available — even if it was scraped as its own
@@ -57,8 +57,8 @@ reference is dropped instead (see above).
 label for independent-study arrangements) are dropped entirely before
 being collapsed into `courses` — see `is_excluded()`. These are one-off
 student/faculty arrangements, not real courses, and nothing else in the
-scraped data references them as a prerequisite/equivalency, so excluding
-them doesn't leave any dangling stub nodes behind.
+scraped data references them as a prerequisite, so excluding them doesn't
+leave any dangling stub nodes behind.
 
 Usage:
     python3 build_database.py              # reads data/, writes db/ + docs/graph.json
@@ -163,8 +163,8 @@ def referenced_courses(node: dict) -> set[str]:
 def is_deprecated_code(code: str) -> bool:
     """EN.550.* is the department's pre-renumbering code (now EN.553.*).
     It never appears as a scraped course, only as a stale reference inside
-    other courses' prerequisite/equivalency data, and is dropped everywhere
-    rather than kept as a stub node."""
+    other courses' prerequisite data, and is dropped everywhere rather than
+    kept as a stub node."""
     return code.startswith("EN.550.")
 
 
@@ -228,7 +228,6 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> tuple[dict[str, d
         "sections": [],     # list of (term, section, instructors, syllabus_url,
                             #           max_seats, seats_available, waitlisted, status)
         "prereq_raw": [],   # list of (expression, description, is_negative)
-        "equivalent_to": set(),
         "pcc_titles": {},   # course code -> title, from PrereqCoursesCatalogs
     })
 
@@ -272,10 +271,6 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> tuple[dict[str, d
                     p.get("Description", ""),
                     p.get("IsNegative") == "Y",
                 ))
-            for eq in sd.get("Equivalencies") or []:
-                name = eq.get("CourseName")
-                if name:
-                    row["equivalent_to"].add(name)
             for pcc in sd.get("PrereqCoursesCatalogs") or []:
                 name, title = pcc.get("Name"), pcc.get("Title")
                 if name and title:
@@ -307,10 +302,10 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> tuple[dict[str, d
             return most_common(by_code[code]["titles"])
         return external_titles.get(code)
 
-    # Only AMS courses' own prerequisite/equivalency data defines which
-    # external courses are worth a stub node — an external course's own
-    # prereqs (e.g. EN.500.113's mutual-exclusion with other EN.500
-    # sections) aren't part of the AMS graph. This first pass is unfiltered
+    # Only AMS courses' own prerequisite data defines which external
+    # courses are worth a stub node — an external course's own prereqs
+    # (e.g. EN.500.113's mutual-exclusion with other EN.500 sections)
+    # aren't part of the AMS graph. This first pass is unfiltered
     # (drop_codes isn't known yet) — it just finds the full universe of
     # referenced codes.
     referenced = set()
@@ -319,7 +314,6 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> tuple[dict[str, d
         for expr, _desc, _neg in row["prereq_raw"]:
             if expr:
                 referenced |= referenced_courses(parse_expression(expr))
-        referenced |= row["equivalent_to"]
 
     # Drop EN.550.* deprecated codes and any code with no usable title —
     # nothing worth showing, and no way to tell real signal from scrape
@@ -347,7 +341,6 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> tuple[dict[str, d
             "terms": sorted(row["terms"], key=_term_sort_key),
             "sections": dedupe_preserve_order(row["sections"]),
             "prereq_raw": dedupe_preserve_order(row["prereq_raw"]),
-            "equivalent_to": sorted(c for c in row["equivalent_to"] if c not in drop_codes),
             "stub": False,
         }
 
@@ -356,7 +349,7 @@ def build_courses(term_files: list[tuple[str, list[dict]]]) -> tuple[dict[str, d
             "code": code, "title": external_titles.get(code), "description": None,
             "department": None, "school": None, "level": None, "credits": None,
             "all_departments": [], "areas": [], "pos_tags": [], "cross_listed": False,
-            "terms": [], "sections": [], "prereq_raw": [], "equivalent_to": [],
+            "terms": [], "sections": [], "prereq_raw": [],
             "stub": True,
         }
 
@@ -433,12 +426,6 @@ CREATE TABLE prereq_nodes (
     raw_description TEXT           -- set on root nodes only
 );
 
-CREATE TABLE equivalencies (
-    course_a TEXT REFERENCES courses(code),
-    course_b TEXT REFERENCES courses(code),
-    PRIMARY KEY (course_a, course_b)
-);
-
 CREATE TABLE metadata (
     key TEXT PRIMARY KEY,
     value TEXT
@@ -485,13 +472,6 @@ def build_database(courses: dict[str, dict], drop_codes: set[str], db_path: str,
             if tree is None:
                 continue
             insert_prereq_root(cur, code, tree, is_negative, expression, description)
-
-        for other in c["equivalent_to"]:
-            a, b = sorted((code, other))
-            cur.execute(
-                "INSERT OR IGNORE INTO equivalencies (course_a, course_b) VALUES (?, ?)",
-                (a, b),
-            )
 
     conn.commit()
     conn.close()
@@ -617,16 +597,6 @@ def build_graph(courses: dict[str, dict], drop_codes: set[str], generated_at: st
                     waitlisted, status in c["sections"]
             ],
         })
-
-    seen_pairs = set()
-    for code, c in courses.items():
-        for other in c["equivalent_to"]:
-            pair = tuple(sorted((code, other)))
-            if pair in seen_pairs:
-                continue
-            seen_pairs.add(pair)
-            edges.append({"source": pair[0], "target": pair[1], "type": "equivalent",
-                           "group_id": None, "logic": None})
 
     return {"generated_at": generated_at, "nodes": nodes, "edges": edges}
 

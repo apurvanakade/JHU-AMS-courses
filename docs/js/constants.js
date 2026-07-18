@@ -11,7 +11,6 @@ export const LEVEL_LABEL = {
 export const EDGE_STYLE = {
   prerequisite: { dash: [], arrow: true, width: 1 },
   exclusion:    { dash: [6, 4], arrow: false, width: 1 },
-  equivalent:   { dash: [], arrow: false, width: 2.4 },
 };
 
 // Color is keyed by degree (Undergraduate/Graduate — two hues, fixed) with

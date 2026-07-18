@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 A scraper for JHU course listings, scoped to Applied Mathematics &
 Statistics, plus a database builder and static visualizer that turn the
 scraped terms into a browsable map of how courses connect (prerequisites,
-exclusions, equivalencies). Three pieces: `fetch_courses.py` (scraper),
+exclusions). Three pieces: `fetch_courses.py` (scraper),
 `build_database.py` (extracts connections into a database), and
 `docs/index.html` (the visualizer, published via GitHub Pages from `docs/`).
 
@@ -93,7 +93,6 @@ into one row per course, extracting the relationships between courses:
   `OR`) since even JHU's own human-readable description of that expression
   leaves the ambiguity unresolved.
 - **Exclusions** — `IsNegative: "Y"` on a prerequisite entry.
-- **Equivalencies** — cross-numbering, e.g. `EN.553.310` ≡ `EN.553.311`.
 
 JHU's `CoRequisites` field is read from the scraped data but never
 extracted into the database or graph — despite the name, it's always
@@ -105,13 +104,13 @@ generic exclusion, the field is dropped entirely.
 
 `EN.550.*` is the department's old numbering, from before it was renumbered
 to `EN.553.*`; it never appears as a scraped course, only as a stale
-reference inside another course's prerequisite/equivalency data (JHU's own
-records still carry the old codes in a handful of spots). Every such
-reference is dropped completely — not even a stub node — via
+reference inside another course's prerequisite data (JHU's own records
+still carry the old codes in a handful of spots). Every such reference is
+dropped completely — not even a stub node — via
 `is_deprecated_code()`/`strip_codes()` in `build_courses()`.
 
 Only `EN.553.*` codes count as real AMS courses. Any other code referenced
-as a prerequisite/equivalency of an AMS course (e.g. `AS.110.202` Calculus
+as a prerequisite of an AMS course (e.g. `AS.110.202` Calculus
 III, or a cross-listed `EN.500`/`EN.601` course pulled in via
 `AllDepartments` matching) gets a stub node instead of a full one, titled
 from JHU's own `PrereqCoursesCatalogs` metadata or its own scraped title
@@ -125,14 +124,14 @@ label for independent-study arrangements) are dropped before they're
 collapsed into a course row (`is_excluded()`) — these are one-off
 student/faculty arrangements, not real courses, and add nodes to the graph
 with little to no navigational value. Nothing else in the scraped data
-references them as a prerequisite/equivalency, so dropping them doesn't
-leave dangling stub nodes behind.
+references them as a prerequisite, so dropping them doesn't leave dangling
+stub nodes behind.
 
 Two outputs, both fully reproducible by re-running the script:
 - `db/courses.db` (SQLite, gitignored) — the queryable source of truth,
   with prerequisite logic stored as a tree via `parent_id` rather than
   flattened, so `(A or B) and C` round-trips exactly. Most tables
-  (`courses`, `prereq_nodes`, `equivalencies`) hold one row per course,
+  (`courses`, `prereq_nodes`) hold one row per course,
   since that's the collapsed unit the rest of the script works with.
   `course_sections` is the exception: it keeps one row per actual section
   per term (`instructors`, `syllabus_url`, `max_seats`, `seats_available`,
@@ -188,7 +187,7 @@ the "300s" column), ordered top-to-bottom within each column by a one-time
 barycenter sweep against connected courses to reduce crossings. Node fill
 color encodes level (categorical, one hue per column); edge dash pattern
 encodes relationship type (solid+arrow = prerequisite, dashed = mutually
-exclusive, thick solid = equivalent). There is no physics simulation —
+exclusive). There is no physics simulation —
 positions are computed once at load and never move on their own; the only
 interactivity is pan/zoom/click.
 

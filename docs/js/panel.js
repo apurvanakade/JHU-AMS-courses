@@ -145,8 +145,6 @@ export function selectNode(n) {
   const unlocks = store.edges.filter(e => e.type === "prerequisite" && e.source.id === n.id).map(e => e.target.id);
   const excludedBy = store.edges.filter(e => e.type === "exclusion" && (e.source.id === n.id || e.target.id === n.id))
     .map(e => (e.source.id === n.id ? e.target.id : e.source.id));
-  const equivalents = store.edges.filter(e => e.type === "equivalent" && (e.source.id === n.id || e.target.id === n.id))
-    .map(e => (e.source.id === n.id ? e.target.id : e.source.id));
 
   if (unlocks.length) {
     panelBody.appendChild(el("h3", { text: "Is a prerequisite for" }));
@@ -158,12 +156,6 @@ export function selectNode(n) {
     panelBody.appendChild(el("h3", { text: "Mutually exclusive with" }));
     const list = document.createElement("div");
     Array.from(new Set(excludedBy)).forEach(code => { list.appendChild(courseLink(code)); list.appendChild(document.createElement("br")); });
-    panelBody.appendChild(list);
-  }
-  if (equivalents.length) {
-    panelBody.appendChild(el("h3", { text: "Equivalent to" }));
-    const list = document.createElement("div");
-    Array.from(new Set(equivalents)).forEach(code => { list.appendChild(courseLink(code)); list.appendChild(document.createElement("br")); });
     panelBody.appendChild(list);
   }
 

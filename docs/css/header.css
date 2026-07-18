@@ -45,7 +45,6 @@ header .spacer { flex: 1; }
 .chip.legend-item { cursor: default; }
 .chip .swatch { width: 14px; height: 2px; border-radius: 1px; display: inline-block; background: var(--edge-ink); }
 .chip .swatch.dashed { background: none; border-top: 2px dashed var(--edge-ink); height: 0; }
-.chip .swatch.thick { height: 3px; }
 .chip .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: none; }
 .legend-shape { width: 9px; height: 9px; display: inline-block; background: var(--muted); flex: none; }
 .legend-shape.diamond { border-radius: 2px; transform: rotate(45deg); }

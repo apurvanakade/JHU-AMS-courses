@@ -85,10 +85,9 @@ function applyFilters(pushHistory) {
   store.activeEdges = store.edges.filter(e => e.source.visible && e.target.visible);
 
   // Node radius = how many currently-visible courses require this one as
-  // a prerequisite (outgoing "prerequisite" edges only — not
-  // exclusion/equivalent, and not incoming edges). Recomputed on every
-  // filter change since the count only makes sense against what's
-  // actually on screen right now.
+  // a prerequisite (outgoing "prerequisite" edges only — not exclusion,
+  // and not incoming edges). Recomputed on every filter change since the
+  // count only makes sense against what's actually on screen right now.
   const outCount = new Map();
   for (const e of store.activeEdges) {
     if (e.type !== "prerequisite") continue;
