@@ -4412,6 +4412,270 @@
     "InstructionMethodFilter": [
       "Blended"
     ],
+    "Instructors": "S. Ma",
+    "InstructorsDelimited": [
+      "Ma, Shiqian"
+    ],
+    "InstructorsFullName": "Ma, Shiqian",
+    "IsIndependentStudy": "Y",
+    "IsWritingIntensive": "Non-Writing Intensive",
+    "Level": "Graduate Independent Academic Work",
+    "Location": "Homewood Campus",
+    "LocationDelimited": [
+      "Homewood Campus"
+    ],
+    "MaxSeats": "10",
+    "MedicineMDOnly": "N",
+    "MeetingFormats": [
+      "Independent Study/Research"
+    ],
+    "Meetings": "",
+    "OfferingName": "EN.553.800",
+    "OfferingVariations": [
+      "EN.553",
+      "553.800",
+      "800"
+    ],
+    "PosTags": [],
+    "Repeatable": "Y",
+    "SSS_SectionsID": "894470",
+    "SchoolName": "Whiting School of Engineering",
+    "SeatsAvailable": "10/10",
+    "SectionDetails": {
+      "CoRequisites": [],
+      "CreditType": "",
+      "Credits": "3.00 - 20.00",
+      "CrossListed": "N",
+      "DepartmentID": "43",
+      "Departments": "EN Applied Mathematics & Statistics",
+      "Description": "Reading, research, or project work for advanced graduate students. Arranged individually between students and faculty.",
+      "Equivalencies": [],
+      "EvaluationUrls": [],
+      "Fees": [],
+      "GradeSystemName": "AE Grad Letter",
+      "InstructionMethods": "Blended",
+      "Instructors": [
+        {
+          "HopkinsID": "23E750"
+        }
+      ],
+      "Meetings": [
+        {
+          "Building": "",
+          "DOW": "None",
+          "Dates": "08-31-2026 to 12-11-2026",
+          "Format": "Independent Study/Research",
+          "Times": ""
+        }
+      ],
+      "PosTags": [],
+      "PrereqCoursesCatalogs": [],
+      "Prerequisites": [],
+      "Restrictions": [
+        {
+          "Description": "",
+          "RestrictionName": "Grad students"
+        }
+      ],
+      "SampleSyllabus": "",
+      "SectionCoReqNotes": "",
+      "SectionCoRequisites": "",
+      "StandardSyllabusLink": "",
+      "TextbookInformations": [
+        {
+          "AttributeValue": "Follett",
+          "BookstoreID": "2393",
+          "ClassStartDate": "20260831",
+          "CourseName": "EN.553.800",
+          "CourseNumber": "800",
+          "Department": "EN553",
+          "IdrGroupTerm": "Fall 2026",
+          "Location": "Homewood Campus",
+          "MbsGroupDesignator": "",
+          "MbsSiteCode": "",
+          "Name": "35",
+          "SectionNumber": "35",
+          "Term": "Fall2026",
+          "ZonesName": "ASEN - UGrad"
+        }
+      ],
+      "WebNotes": ""
+    },
+    "SectionName": "35",
+    "SectionRegRestrictions": "",
+    "SelfSearch": "Y",
+    "Status": "Open",
+    "SubDepartment": "",
+    "Syllabus_Url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=152191",
+    "Term": "Fall 2026",
+    "TermStartDate": "2026-08-31 00:00:00.000",
+    "Term_IDR": "Fall 2026",
+    "Term_JSS": [
+      "Fall 2026"
+    ],
+    "TimeOfDay": "Other",
+    "Title": "Dissertation Research",
+    "UGradPHStudies": "No",
+    "Waitlisted": "0",
+    "ZoneName": "ASEN - UGrad",
+    "ZonesId": 5,
+    "id": "894470"
+  },
+  {
+    "AllDepartments": [
+      "EN Applied Mathematics & Statistics"
+    ],
+    "Areas": [],
+    "Building": "",
+    "CMN_TermsID": 1761,
+    "CoursePrefix": "EN",
+    "Credits": "3.00 - 20.00",
+    "DOW": [],
+    "DOWSort": "99",
+    "DaysOfWeek": 0,
+    "Department": "EN Applied Mathematics & Statistics",
+    "Description": "Reading, research, or project work for advanced graduate students. Arranged individually between students and faculty.",
+    "HasBio": "N",
+    "HierarchicalTerm": {
+      "lvl0": "Fall 2026",
+      "lvl1": []
+    },
+    "InstructionMethod": "Blended",
+    "InstructionMethodFilter": [
+      "Blended"
+    ],
+    "Instructors": "A. Srivastava",
+    "InstructorsDelimited": [
+      "Srivastava, Anuj"
+    ],
+    "InstructorsFullName": "Srivastava, Anuj",
+    "IsIndependentStudy": "Y",
+    "IsWritingIntensive": "Non-Writing Intensive",
+    "Level": "Graduate Independent Academic Work",
+    "Location": "Homewood Campus",
+    "LocationDelimited": [
+      "Homewood Campus"
+    ],
+    "MaxSeats": "10",
+    "MedicineMDOnly": "N",
+    "MeetingFormats": [
+      "Independent Study/Research"
+    ],
+    "Meetings": "",
+    "OfferingName": "EN.553.800",
+    "OfferingVariations": [
+      "EN.553",
+      "553.800",
+      "800"
+    ],
+    "PosTags": [],
+    "Repeatable": "Y",
+    "SSS_SectionsID": "894469",
+    "SchoolName": "Whiting School of Engineering",
+    "SeatsAvailable": "10/10",
+    "SectionDetails": {
+      "CoRequisites": [],
+      "CreditType": "",
+      "Credits": "3.00 - 20.00",
+      "CrossListed": "N",
+      "DepartmentID": "43",
+      "Departments": "EN Applied Mathematics & Statistics",
+      "Description": "Reading, research, or project work for advanced graduate students. Arranged individually between students and faculty.",
+      "Equivalencies": [],
+      "EvaluationUrls": [],
+      "Fees": [],
+      "GradeSystemName": "AE Grad Letter",
+      "InstructionMethods": "Blended",
+      "Instructors": [
+        {
+          "HopkinsID": "DAB154"
+        }
+      ],
+      "Meetings": [
+        {
+          "Building": "",
+          "DOW": "None",
+          "Dates": "08-31-2026 to 12-11-2026",
+          "Format": "Independent Study/Research",
+          "Times": ""
+        }
+      ],
+      "PosTags": [],
+      "PrereqCoursesCatalogs": [],
+      "Prerequisites": [],
+      "Restrictions": [
+        {
+          "Description": "",
+          "RestrictionName": "Grad students"
+        }
+      ],
+      "SampleSyllabus": "",
+      "SectionCoReqNotes": "",
+      "SectionCoRequisites": "",
+      "StandardSyllabusLink": "",
+      "TextbookInformations": [
+        {
+          "AttributeValue": "Follett",
+          "BookstoreID": "2393",
+          "ClassStartDate": "20260831",
+          "CourseName": "EN.553.800",
+          "CourseNumber": "800",
+          "Department": "EN553",
+          "IdrGroupTerm": "Fall 2026",
+          "Location": "Homewood Campus",
+          "MbsGroupDesignator": "",
+          "MbsSiteCode": "",
+          "Name": "34",
+          "SectionNumber": "34",
+          "Term": "Fall2026",
+          "ZonesName": "ASEN - UGrad"
+        }
+      ],
+      "WebNotes": ""
+    },
+    "SectionName": "34",
+    "SectionRegRestrictions": "",
+    "SelfSearch": "Y",
+    "Status": "Open",
+    "SubDepartment": "",
+    "Syllabus_Url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=152191",
+    "Term": "Fall 2026",
+    "TermStartDate": "2026-08-31 00:00:00.000",
+    "Term_IDR": "Fall 2026",
+    "Term_JSS": [
+      "Fall 2026"
+    ],
+    "TimeOfDay": "Other",
+    "Title": "Dissertation Research",
+    "UGradPHStudies": "No",
+    "Waitlisted": "0",
+    "ZoneName": "ASEN - UGrad",
+    "ZonesId": 5,
+    "id": "894469"
+  },
+  {
+    "AllDepartments": [
+      "EN Applied Mathematics & Statistics"
+    ],
+    "Areas": [],
+    "Building": "",
+    "CMN_TermsID": 1761,
+    "CoursePrefix": "EN",
+    "Credits": "3.00 - 20.00",
+    "DOW": [],
+    "DOWSort": "99",
+    "DaysOfWeek": 0,
+    "Department": "EN Applied Mathematics & Statistics",
+    "Description": "Reading, research, or project work for advanced graduate students. Arranged individually between students and faculty.",
+    "HasBio": "N",
+    "HierarchicalTerm": {
+      "lvl0": "Fall 2026",
+      "lvl1": []
+    },
+    "InstructionMethod": "Blended",
+    "InstructionMethodFilter": [
+      "Blended"
+    ],
     "Instructors": "T. Kunisky",
     "InstructorsDelimited": [
       "Kunisky, Tim"
@@ -8800,7 +9064,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867606",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "8/24",
+    "SeatsAvailable": "6/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -9901,7 +10165,7 @@
       "EN Robotics"
     ],
     "Areas": [],
-    "Building": "Maryland",
+    "Building": "Olin",
     "CMN_TermsID": 1761,
     "CoursePrefix": "EN",
     "Credits": "3.00",
@@ -9909,11 +10173,11 @@
       "Tuesday",
       "Thursday"
     ],
-    "DOWSort": "02^16:30:00",
+    "DOWSort": "02^09:00:00",
     "DaysOfWeek": 10,
     "Department": "EN Applied Mathematics & Statistics",
     "Description": "This course considers algorithms for solving various nonlinear optimization problems and, in parallel, develops the supporting theory. The primary focus will be on unconstrained optimization problems. Topics for the course will include: necessary and sufficient optimality conditions; steepest descent method; Newton and quasi-Newton based line-search, trust-region, and adaptive cubic regularization methods; linear and nonlinear least-squares problems; linear and nonlinear conjugate gradient methods. \nRecommended Course Background: Multivariable Calculus, Linear Algebra, Real Analysis such as AS.110.405",
-    "EndTime": 1745,
+    "EndTime": 1015,
     "HasBio": "N",
     "HierarchicalTerm": {
       "lvl0": "Fall 2026",
@@ -9938,7 +10202,7 @@
     "MeetingFormats": [
       "Lecture"
     ],
-    "Meetings": "TTh 4:30PM - 5:45PM",
+    "Meetings": "TTh 9:00AM - 10:15AM",
     "OfferingName": "EN.553.761",
     "OfferingVariations": [
       "EN.553",
@@ -9952,7 +10216,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867078",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "5/49",
+    "SeatsAvailable": "6/49",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -9973,11 +10237,11 @@
       ],
       "Meetings": [
         {
-          "Building": "Maryland",
+          "Building": "Olin",
           "DOW": "TTh",
           "Dates": "08-31-2026 to 12-11-2026",
           "Format": "Lecture",
-          "Times": "04:30 PM - 05:45 PM"
+          "Times": "09:00 AM - 10:15 AM"
         }
       ],
       "PosTags": [
@@ -10029,7 +10293,7 @@
     "SectionName": "01",
     "SectionRegRestrictions": "",
     "SelfSearch": "Y",
-    "StartTime": 1630,
+    "StartTime": 900,
     "Status": "Open",
     "SubDepartment": "",
     "Syllabus_Url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=123390",
@@ -10039,7 +10303,7 @@
     "Term_JSS": [
       "Fall 2026"
     ],
-    "TimeOfDay": "Afternoon",
+    "TimeOfDay": "Morning",
     "Title": "Nonlinear Optimization I",
     "UGradPHStudies": "No",
     "Waitlisted": "0",
@@ -10384,7 +10648,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867649",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "18/25",
+    "SeatsAvailable": "17/25",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -10734,7 +10998,7 @@
     "TimeOfDay": "Other",
     "Title": "Large Language Models: Foundations and Algorithms",
     "UGradPHStudies": "No",
-    "Waitlisted": "11",
+    "Waitlisted": "13",
     "ZoneName": "ASEN - UGrad",
     "ZonesId": 5,
     "id": "880924"
@@ -13027,6 +13291,14 @@
       "PosTags": [],
       "PrereqCoursesCatalogs": [
         {
+          "Description": "Probability and its applications, at the calculus level. Emphasis on techniques of application and on rigorous mathematical demonstration. Probability, combinatorial probability, random variables, distribution functions, important probability distributions, independence, conditional probability, moments, covariance and correlation, limit theorems.  Recommended course background: (AS.110.109 or  AS.110.113) and previously or concurrently (AS.110.202 or AS.110.201 or AS.110.212).",
+          "Name": "EN.553.620",
+          "SssCoursesId": 39380,
+          "StatusName": "Active",
+          "TermName": "AE Fall 2026",
+          "Title": "Probability"
+        },
+        {
           "Description": "Mathematical analysis of cooperative and noncooperative games. Theory and solution methods for matrix game (two players, zero-sum payoffs, finite strategy sets), games with a continuum of strategies, N-player games, games in rule-defined form. The roles of information and memory. Selected applications to economic, recreational, and military situations. Prereq: Multivariable Calculus, probability, linear algebra.",
           "Name": "EN.553.453",
           "SssCoursesId": 39614,
@@ -13038,14 +13310,6 @@
           "Description": "Probability and its applications, at the calculus level. Emphasis on techniques of application and on rigorous mathematical demonstration.  Probability, combinatorial probability, random variables, distribution functions, important probability distributions, independence, conditional probability, moments, covariance and correlation, limit theorems.  Students initiating graduate work in probability or statistics should enroll in EN.553.620 or EN.553.720.  Prerequisites: one year of calculus.  Corequisites: multivariable calculus and linear algebra.\n\nStudents who have received credit for AS.110.106 and/or AS.110.107 taken prior to Fall 2020 should contact the course instructor to determine whether they can receive permission to register for this course.",
           "Name": "EN.553.420",
           "SssCoursesId": 39352,
-          "StatusName": "Active",
-          "TermName": "AE Fall 2026",
-          "Title": "Probability"
-        },
-        {
-          "Description": "Probability and its applications, at the calculus level. Emphasis on techniques of application and on rigorous mathematical demonstration. Probability, combinatorial probability, random variables, distribution functions, important probability distributions, independence, conditional probability, moments, covariance and correlation, limit theorems.  Recommended course background: (AS.110.109 or  AS.110.113) and previously or concurrently (AS.110.202 or AS.110.201 or AS.110.212).",
-          "Name": "EN.553.620",
-          "SssCoursesId": 39380,
           "StatusName": "Active",
           "TermName": "AE Fall 2026",
           "Title": "Probability"
@@ -13323,7 +13587,7 @@
         "Description": "Quantitative Studies (Q)"
       }
     ],
-    "Building": "Gilman, Hodson",
+    "Building": "Hodson, Maryland",
     "CMN_TermsID": 1761,
     "CoursePrefix": "EN",
     "Credits": "4.00",
@@ -13396,7 +13660,7 @@
       ],
       "Meetings": [
         {
-          "Building": "Gilman",
+          "Building": "Maryland",
           "DOW": "TTh",
           "Dates": "08-31-2026 to 12-11-2026",
           "Format": "Lecture",
@@ -18409,7 +18673,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866968",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "20/28",
+    "SeatsAvailable": "21/28",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -20455,7 +20719,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867055",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "9/14",
+    "SeatsAvailable": "8/14",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -21872,7 +22136,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867662",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "0/12",
+    "SeatsAvailable": "1/12",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -25075,7 +25339,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866955",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "14/24",
+    "SeatsAvailable": "13/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -25671,7 +25935,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866953",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "12/24",
+    "SeatsAvailable": "11/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -27250,7 +27514,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866948",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "0/24",
+    "SeatsAvailable": "1/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -27413,7 +27677,7 @@
     "SectionRegRestrictions": "",
     "SelfSearch": "Y",
     "StartTime": 1000,
-    "Status": "Waitlist Only",
+    "Status": "Open",
     "SubDepartment": "",
     "Syllabus_Url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=123268",
     "Term": "Fall 2026",
@@ -27514,7 +27778,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866947",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "7/24",
+    "SeatsAvailable": "6/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -28042,7 +28306,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866945",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "1/24",
+    "SeatsAvailable": "2/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -29498,7 +29762,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866939",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "0/24",
+    "SeatsAvailable": "1/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -29645,7 +29909,7 @@
     "SectionRegRestrictions": "",
     "SelfSearch": "Y",
     "StartTime": 1100,
-    "Status": "Waitlist Only",
+    "Status": "Open",
     "SubDepartment": "",
     "Syllabus_Url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=123262",
     "Term": "Fall 2026",
@@ -29897,7 +30161,7 @@
     "TimeOfDay": "Other",
     "Title": "Intermediate Probability and Statistics",
     "UGradPHStudies": "No",
-    "Waitlisted": "2",
+    "Waitlisted": "0",
     "ZoneName": "ASEN - UGrad",
     "ZonesId": 5,
     "id": "866938"
@@ -29978,7 +30242,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866937",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "1/24",
+    "SeatsAvailable": "2/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -30125,7 +30389,7 @@
     "SectionRegRestrictions": "",
     "SelfSearch": "Y",
     "StartTime": 900,
-    "Status": "Waitlist Only",
+    "Status": "Open",
     "SubDepartment": "",
     "Syllabus_Url": "https://assessment.jhu.edu/index.cfm/page/AefisCourseSection.publicSyllabus?courseSectionId=123260",
     "Term": "Fall 2026",
@@ -30405,7 +30669,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867660",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "21/24",
+    "SeatsAvailable": "20/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -31064,7 +31328,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866933",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "9/24",
+    "SeatsAvailable": "8/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -32021,7 +32285,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867013",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "17/24",
+    "SeatsAvailable": "16/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -32809,7 +33073,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "867010",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "9/24",
+    "SeatsAvailable": "8/24",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -33789,7 +34053,7 @@
     "TimeOfDay": "Morning",
     "Title": "Probability and Statistics for the Life Sciences",
     "UGradPHStudies": "No",
-    "Waitlisted": "3",
+    "Waitlisted": "2",
     "ZoneName": "ASEN - UGrad",
     "ZonesId": 5,
     "id": "867007"
@@ -34540,7 +34804,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866924",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "5/24",
+    "SeatsAvailable": "4/24",
     "SectionDetails": {
       "CoRequisites": [
         {
@@ -34794,7 +35058,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866923",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "11/18",
+    "SeatsAvailable": "10/18",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -35220,7 +35484,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "866840",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "39/40",
+    "SeatsAvailable": "38/40",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -35898,7 +36162,7 @@
     "SectionRegRestrictions": "",
     "SelfSearch": "Y",
     "StartTime": 1400,
-    "Status": "Open",
+    "Status": "Closed",
     "SubDepartment": "",
     "Syllabus_Url": "https://assessment.jhu.edu/index.cfm/page/AefisCourse.publicSyllabus?courseid=2413",
     "Term": "Fall 2026",
@@ -35940,7 +36204,7 @@
         "Description": "Science and Data (FA2)"
       }
     ],
-    "Building": "Clark",
+    "Building": "Hodson",
     "CMN_TermsID": 1761,
     "CoursePrefix": "EN",
     "Credits": "3.00",
@@ -35949,11 +36213,11 @@
       "Wednesday",
       "Friday"
     ],
-    "DOWSort": "01^12:00:00",
+    "DOWSort": "01^11:00:00",
     "DaysOfWeek": 21,
     "Department": "EN General Engineering",
     "Description": "This course introduces fundamental programming concepts and techniques, and is intended for all who plan to develop computational artifacts or intelligently deploy computational tools in their studies and careers. Topics covered include the design and implementation of algorithms using variables, control structures, arrays, functions, files, testing, debugging, and structured program design. Elements of object-oriented programming. algorithmic efficiency and data visualization are also introduced. Students deploy programming to develop working solutions that address problems in engineering, science and other areas of contemporary interest that vary from section to section. Course homework involves significant programming. Attendance and participation in class sessions are expected.",
-    "EndTime": 1250,
+    "EndTime": 1150,
     "HasBio": "N",
     "HierarchicalTerm": {
       "lvl0": "Fall 2026",
@@ -35980,7 +36244,7 @@
     "MeetingFormats": [
       "Lecture"
     ],
-    "Meetings": "MWF 12:00PM - 12:50PM",
+    "Meetings": "MWF 11:00AM - 11:50AM",
     "OfferingName": "EN.500.113",
     "OfferingVariations": [
       "EN.500",
@@ -36014,11 +36278,11 @@
       ],
       "Meetings": [
         {
-          "Building": "Clark",
+          "Building": "Hodson",
           "DOW": "MWF",
           "Dates": "08-31-2026 to 12-11-2026",
           "Format": "Lecture",
-          "Times": "12:00 PM - 12:50 PM"
+          "Times": "11:00 AM - 11:50 AM"
         }
       ],
       "PosTags": [
@@ -36103,7 +36367,7 @@
     "SectionName": "13",
     "SectionRegRestrictions": "",
     "SelfSearch": "Y",
-    "StartTime": 1200,
+    "StartTime": 1100,
     "Status": "Open",
     "SubDepartment": "",
     "Syllabus_Url": "https://assessment.jhu.edu/index.cfm/page/AefisCourse.publicSyllabus?courseid=2413",
@@ -36113,7 +36377,7 @@
     "Term_JSS": [
       "Fall 2026"
     ],
-    "TimeOfDay": "Afternoon",
+    "TimeOfDay": "Morning",
     "Title": "Gateway Computing: Python",
     "UGradPHStudies": "No",
     "Waitlisted": "0",
@@ -36199,7 +36463,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "880580",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "16/19",
+    "SeatsAvailable": "14/19",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -36405,7 +36669,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "865879",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "14/19",
+    "SeatsAvailable": "13/19",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -36852,6 +37116,22 @@
       ],
       "PrereqCoursesCatalogs": [
         {
+          "Description": "This on-line course provides students who have already achieved a basic understanding of programming and computational thinking in one programming language with an opportunity to apply these skills in another programming language. Students will be expected to complete projects to demonstrate proficiency in the new language. Satisfactory/unsatisfactory only",
+          "Name": "EN.500.133",
+          "SssCoursesId": 41663,
+          "StatusName": "Active",
+          "TermName": "AE Fall 2026",
+          "Title": "Bootcamp: Python"
+        },
+        {
+          "Description": "This on-line course provides students who have already achieved a basic understanding of programming and computational thinking in one programming language with an opportunity to apply these skills in another programming language.  Students will be expected to complete projects to demonstrate proficiency in the new language. Satisfactory/unsatisfactory only.",
+          "Name": "EN.500.134",
+          "SssCoursesId": 41664,
+          "StatusName": "Active",
+          "TermName": "AE Fall 2026",
+          "Title": "Bootcamp: MATLAB"
+        },
+        {
           "Description": "This course introduces fundamental programming concepts and techniques, and is intended for all who plan to develop computational artifacts or intelligently deploy computational tools in their studies and careers. Topics covered include the design and implementation of algorithms using variables, control structures, arrays, functions, files, testing, debugging, and structured program design. Elements of object-oriented programming. algorithmic efficiency and data visualization are also introduced. Students deploy programming to develop working solutions that address problems in engineering, science and other areas of contemporary interest that vary from section to section. Course homework involves significant programming. Attendance and participation in class sessions are expected.",
           "Name": "EN.500.112",
           "SssCoursesId": 41151,
@@ -36874,22 +37154,6 @@
           "StatusName": "Active",
           "TermName": "AE Fall 2026",
           "Title": "Bootcamp: Java"
-        },
-        {
-          "Description": "This on-line course provides students who have already achieved a basic understanding of programming and computational thinking in one programming language with an opportunity to apply these skills in another programming language. Students will be expected to complete projects to demonstrate proficiency in the new language. Satisfactory/unsatisfactory only",
-          "Name": "EN.500.133",
-          "SssCoursesId": 41663,
-          "StatusName": "Active",
-          "TermName": "AE Fall 2026",
-          "Title": "Bootcamp: Python"
-        },
-        {
-          "Description": "This on-line course provides students who have already achieved a basic understanding of programming and computational thinking in one programming language with an opportunity to apply these skills in another programming language.  Students will be expected to complete projects to demonstrate proficiency in the new language. Satisfactory/unsatisfactory only.",
-          "Name": "EN.500.134",
-          "SssCoursesId": 41664,
-          "StatusName": "Active",
-          "TermName": "AE Fall 2026",
-          "Title": "Bootcamp: MATLAB"
         }
       ],
       "Prerequisites": [
@@ -37238,7 +37502,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "865875",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "16/19",
+    "SeatsAvailable": "15/19",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -37444,7 +37708,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "865874",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "10/19",
+    "SeatsAvailable": "9/19",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -38062,7 +38326,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "865871",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "14/19",
+    "SeatsAvailable": "13/19",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
@@ -38268,7 +38532,7 @@
     "Repeatable": "N",
     "SSS_SectionsID": "865870",
     "SchoolName": "Whiting School of Engineering",
-    "SeatsAvailable": "16/19",
+    "SeatsAvailable": "15/19",
     "SectionDetails": {
       "CoRequisites": [],
       "CreditType": "",
